@@ -6,8 +6,12 @@ app.controller('rootCtrl', ['$rootScope', '$location', function($rootScope, $loc
     };
 }]);
 
-app.controller('homeCtrl', ['$scope', function($scope) {
+app.controller('homeCtrl', ['$scope', '$modal', function($scope, $modal) {
     document.title = 'Dashboard';
+    var modalinst = $modal.open({
+        templateUrl: 'partials/login.html',
+        controller: 'loginCtrl',
+    });
 }]);
 
 app.controller('aboutCtrl', ['$scope', function($scope) {
@@ -18,3 +22,6 @@ app.controller('404Ctrl', ['$scope', function($scope) {
     document.title = 'Not Found';
 }]);
 
+app.controller('loginCtrl', ['$scope', '$modalInstance', function($scope, $modalInstance) {
+
+}]);

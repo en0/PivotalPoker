@@ -1,8 +1,9 @@
 __author__ = 'ilaird'
 
-from http import app
+from http import app, context
 from flask import render_template, abort
 from jinja2.exceptions import TemplateNotFound
+import redis
 
 
 @app.route('/')
@@ -19,3 +20,4 @@ def default_route(path="index.html"):
         return render_template(path)
     except TemplateNotFound:
         abort(404)
+
