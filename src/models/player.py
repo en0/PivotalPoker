@@ -10,7 +10,6 @@ from models.generic_document import GenericDocumentFactory
 
 Player = GenericDocumentFactory("PokerPlayer", [
     # Name,       Req,   Pub
-    ('game_id',   True,  True),
     ('player_id', True,  False),
     ('name',      True,  True),
 ])

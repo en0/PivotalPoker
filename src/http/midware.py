@@ -13,10 +13,10 @@ app.session_interface = RedisSessionInterface(redis.connect())
 
 @app.before_request
 def request_init():
-    context.db_connection = redis.connection
+    context.db = redis.connection
 
     if 'user' in session:
-        context.user = Session.create(session['user'])
+        context.user = Session.load(session['user'])
     else:
         context.user = None
 

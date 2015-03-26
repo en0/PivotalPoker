@@ -13,35 +13,21 @@ class Game(ResourceBase):
 
     def get(self, game_id=None):
         if game_id:
-            _game = models.Game.load(uuid=game_id)
+            _game = models.Game.load(uuid=game_id, db=context.db)
             if _game is None:
                 raise ApiException("Not Found", 404)
             _ret = _game.entity
-            _ret['game_id'] = _game.uuid
         else:
-            _ret = dict(games=models.Game.list())
+            _ret = dict(games=models.Game.list(db=context.db))
         return _ret
 
     def post(self):
-        json = request.get_json()
-
-        # Can we move this into the model definition?
-        json['owner_id'] = context.user.player_id
-        json['owner_name'] = context.user.name
-        json['players'] = {}
-        json['hands'] = []
-        json['current_hand'] = None
-        json['total_pts'] = 0
-        json['state'] = 'Open'
-
-        _game = models.Game.create(json=json)
+        _game = models.Game.create(context.user.player_id, context.user.name, request.get_json(), db=context.db)
         _game.save()
-        _ret = _game.private_entity
-        _ret['game_id'] = _game.uuid
-        return _ret, 200, {'Location': '/api/v0.1/game/{0}'.format(_game.uuid)}
+        return _game.private_entity, 200, {'Location': '/api/v0.1/game/{0}'.format(_game.uuid)}
 
     def delete(self, game_id):
-        _game = models.Game.load(uuid=game_id)
+        _game = models.Game.load(uuid=game_id, db=context.db)
 
         if _game is None:
             raise ApiException("Not Found", 404)

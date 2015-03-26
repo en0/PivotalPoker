@@ -1,17 +1,11 @@
 __author__ = 'en0'
 
-from uuid import uuid4
 from models.utils import _repr_from_keys
 
 
 class GenericDocument(object):
     def __init__(self):
         self.__document__ = {}
-        self.__uuid__ = None
-
-    @property
-    def uuid(self):
-        return self.__uuid__
 
     @property
     def entity(self):
@@ -28,14 +22,11 @@ class GenericDocument(object):
             fields=self.__required_fields__,
             optional_fields=self.__optional_fields__
         )
-
-        _ret['__uuid__'] = self.__uuid__
         return _ret
 
     @classmethod
-    def create(cls, json):
+    def load(cls, json):
         _ret = cls()
-        _ret.__uuid__ = uuid4()
         _ret.__document__ = _repr_from_keys(
             json,
             cls.__required_fields__,
@@ -44,14 +35,9 @@ class GenericDocument(object):
         return _ret
 
     @classmethod
-    def load(cls, uuid, json):
+    def trusted_load(cls, json):
         _ret = cls()
-
-        if '__uuid__' in json:
-            del json['__uuid__']
-
-        _ret = cls.create(json)
-        _ret.__uuid__ = uuid
+        _ret.__document__ = json
         return _ret
 
 
