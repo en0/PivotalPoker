@@ -5,42 +5,38 @@ from http.api.resource_base import ResourceBase, register_route
 import models
 
 
-class Hand(ResourceBase):
-    __uri__ = '/api/v0.1/hand/'
-    __pk__ = 'game_id'
+class Player(ResourceBase):
+    __uri__ = '/api/v0.1/player/<string:game_id>/'
+    __pk__ = 'player_id'
     __pk_type__ = 'string'
-    __method_hints__ = ['PUT', 'DELETE']
+    __method_hints__ = ['POST', 'DELETE']
 
     @models.enqueue
-    def put(self, game_id):
+    def post(self, game_id):
         _game = models.Game.load(game_id)
         if not _game:
             raise ApiException('Not Found', 404)
-        elif _game.owner_id != context.user.player_id:
-            raise ApiException('Forbidden', 403)
-        elif _game.current_hand is not None:
+        elif _game.state != 'Open':
             raise ApiException('Conflict', 409)
 
-        _hand = models.Hand(request.get_json())
-        return models.QueueItem(game_id, _hand)
+        _player = models.Player(context.user.player_id, context.user.name, request.get_json())
+        return models.QueueItem(game_id, _player)
 
     @models.enqueue
-    def delete(self, game_id):
+    def delete(self, game_id, player_id):
         raise NotImplementedError("Untestable without worker thread")
         _game = models.Game.load(game_id)
         if not _game:
             raise ApiException('Not Found', 404)
-        elif _game.owner_id != context.user.player_id:
-            raise ApiException('Forbidden', 403)
-        elif _game.current_hand is None:
-            raise ApiException('Conflict', 409)
+        elif player_id != context.user.player_id and player_id != _game.owner_id:
+            raise ApiException('forbidden', 403)
 
         _request = models.WorkerRequest({
             'request_by': context.user.player_id,
-            'action': 'abort_hand',
-            'params': None
+            'action': 'remove_player',
+            'params': player_id
         })
         return models.QueueItem(game_id, _request)
 
 
-register_route(Hand, app)
+register_route(Player, app)

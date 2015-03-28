@@ -24,8 +24,6 @@ gunicorn -k gevent -b IP:PORT run:app
   * DELETE /api/v0.1/hand/{gameid}: Destroy hand for game _gameid_.
 * Player
   * POST /api/v0.1/player/{gameid}/: Join the game _gameid_.
-  * GET /api/v0.1/player/{gameid}/: List players in a game _gameid_.
-  * GET /api/v0.1/player/{gameid}/{playerid}: Retrieve player _playerid_ from game _gameid_.
   * DELETE /api/v0.1/player/{gameid}/{playerid}: Remove a player _playerid_ from game _gameid_
 * Vote
   * PUT /api/v0.1/vote/{gameid}: Submit the vote for the current hand on game _gameid_.
@@ -253,10 +251,10 @@ The full JSON format of a game resource.
     <dd>The publicly visible title of the game.</dd>
     
     <dt>total_pts</dt>
-    <dd>The accumulated points for this game. This value is dirived by adding accepted votes from each hand together.</dd>
+    <dd>The accumulated points for this game. This value is derived by adding accepted votes from each hand together.</dd>
 </dl>
 
-> State Definitions:
+> _State Definitions_
 > <dl>
 >    <dt>Open</dt>
 >    <dd>No hands are currently in play and new users can join at any time.</dd>
@@ -481,5 +479,70 @@ Set-Cookie: session=f30d43c5-cc20-4900-a1a1-f12f135d2fdf; HttpOnly; Path=/
 
 ### DELETE /api/v0.1/hand/{gameid}
 Destroy hand for game _gameid_.
+
+__TO DO__
+
+## Player
+### POST /api/v0.1/player/{gameid}/
+Join the game _gameid_.
+
+The full JSON format of a player resource.
+
+```json
+{
+    "player_id": "feea0a8f-153a-442f-87f8-645fe647bcdf",
+    "name": "Player Name".
+    "password": null
+}
+```
+
+<dl>
+    <dt>player_id</dt>
+    <dd>The unique id for the player trying to join the game.</dd>
+    
+    <dt>name</dt>
+    <dd>The name of the player joining the game.</dd>
+    
+    <dt>password</dt>
+    <dd>Optional, The password to use to authenticate with the game that is being joined to.</dd>
+</dl>
+
+#### Example
+##### Request:
+```http
+POST /api/v0.1/player/0ab33d40-fe6e-4ff6-9543-4795f97fbe15/ HTTP/1.1
+User-Agent: curl/7.41.0
+Host: localhost:5000
+Accept: */*
+Cookie: session=aa50c46f-bdae-43ce-937a-2594ad4e7986
+Content-Type: application/json
+Content-Length: 22
+
+{
+    "password": null
+}
+
+```
+
+##### Response:
+```http
+HTTP/1.1 202 ACCEPTED
+Server: gunicorn/19.2.1
+Date: Sat, 28 Mar 2015 23:19:09 GMT
+Connection: keep-alive
+Content-Type: application/json
+Content-Length: 72
+Replaced cookie session="aa50c46f-bdae-43ce-937a-2594ad4e7986" for domain localhost, path /, expire 0
+Set-Cookie: session=aa50c46f-bdae-43ce-937a-2594ad4e7986; HttpOnly; Path=/
+
+{
+  "job_id": "da4bc804-635e-4fc2-9eb0-ca6ce103e376", 
+  "status": 202
+}
+
+```
+
+### DELETE /api/v0.1/player/{gameid}/{playerid}
+Remove a player _playerid_ from game _gameid_
 
 __TO DO__

@@ -13,7 +13,6 @@ from models.generic_document import GenericDocumentFactory
 
 HandBase = GenericDocumentFactory('PokerHand', [
     # Name,         Req,  Pub
-    ('game_id', True, True),
     ('body', True, True),
     ('votes', True, True),  # dict { 'uuid': { 'name' : 'Player Name', 'vote' : None } }
     ('complete', True, True),
@@ -21,14 +20,11 @@ HandBase = GenericDocumentFactory('PokerHand', [
 
 
 class Hand(HandBase):
-    def __init__(self, game_id=None, json=None, document=None):
+    def __init__(self, json=None, document=None):
         if document:
             _json = None
-        elif game_id is None:
-            raise KeyError()
         else:
             _json = json
-            _json['game_id'] = game_id
             _json['votes'] = {}
             _json['complete'] = False
 
