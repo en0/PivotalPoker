@@ -4,6 +4,8 @@ cd src/
 gunicorn -k gevent -b IP:PORT run:app
 ```
 
+---
+
 ## REST Api
 
 * Session
@@ -42,9 +44,10 @@ The full JSON format of a user resource.
 }
 ```
 
-name
-
-The name that will be showed to other players in the game.
+<dl>
+    <dt>name</dt>
+    <dd>The name that will be showed to other players in the game.</dd>
+</dl>
 
 #### Example
 ##### Request:
@@ -119,13 +122,13 @@ The full JSON format of a job resource.
 }
 ```
 
-job_id
-
-The unique id of referring to a queued item.
-
-status
-
-The last known status of the queued item.
+<dl>
+    <dt>job_id</dt>
+    <dd>The unique id of referring to a queued item.</dd>
+    
+    <dt>status</dt>
+    <dd>The last known status of the queued item.</dd>
+</dl>
 
 #### Example
 ##### Request:
@@ -215,57 +218,46 @@ The full JSON format of a game resource.
 }
 ```
 
-current_hand
+<dl>
+    <dt>current_hand</dt>
+    <dd>Initially NULL, this field will hold a hand entity. The current hand is the hand that all votes will be applied.</dd>
 
-Initially NULL, this field will hold a hand entity. The current hand is the hand that all votes will be applied.
+    <dt>desc</dt>
+    <dd>The details provided by the owner.</dd>
 
-desc
-
-The details provided by the owner.
-
-game_id
-
-The system assigned game id used to interact with the game.
-
-hands
-
-Initially empty, the hands that have already been completed for this game.
-
-owner_id
-
-The player id of the person that created the game.
-
-owner_name
-
-The player name of the person that created the game.
-
-password
-
-The optional password to secure access to this game.
-
-players
-
-Initially empty, the currently enrolled players in the game.
-
-pts_scale
-
-The point scale used for casting votes on any hands for this game.
-
-state
-
-Initially _Open_, the current state of the game.
- - Open: No hands are currently in play and new users can join at any time.
- - Playing: The game is currently in voting on a hand. No players can join at this time.
- - Reviewing: The game has finished a hand and is waiting on the owner to accept or reject the of the vote. No players can join at this time.
- 
-title
-
-The publicly visible title of the game.
-
-total_pts
-
-The accumulated points for this game. This value is dirived by adding accepted votes from each hand together.
-
+    <dt>game_id</dt>
+    <dd>The system assigned game id used to interact with the game.</dd>
+    
+    <dt>hands</dt>
+    <dd>Initially empty, the hands that have already been completed for this game.</dd>
+    
+    <dt>owner_id</dt>
+    <dd>The player id of the person that created the game.</dd>
+    
+    <dt>owner_name</dt>
+    <dd>The player name of the person that created the game.</dd>
+    
+    <dt>password</dt>
+    <dd>The optional password to secure access to this game.</dd>
+    
+    <dt>players</dt>
+    <dd>Initially empty, the currently enrolled players in the game.</dd>
+    
+    <dt>pts_scale</dt>
+    <dd>The point scale used for casting votes on any hands for this game.</dd>
+    
+    <dt>state</dt>
+    <dd>Initially _Open_, the current state of the game.
+     - Open: No hands are currently in play and new users can join at any time.
+     - Playing: The game is currently in voting on a hand. No players can join at this time.
+     - Reviewing: The game has finished a hand and is waiting on the owner to accept or reject the of the vote. No players can join at this time.</dd>
+     
+    <dt>title</dt>
+    <dd>The publicly visible title of the game.</dd>
+    
+    <dt>total_pts</dt>
+    <dd>The accumulated points for this game. This value is dirived by adding accepted votes from each hand together.</dd>
+</dl>
 
 #### Example
 ##### Request:
@@ -440,6 +432,11 @@ The full JSON format of a hand resource.
     "body": "As a/an [actor], I should be able to [feature] so that i can [benefit]"
 }
 ```
+
+<dl>
+    <dt>body</dt>
+    <dd>The body of the new story that will be presented with the hand.</dd>
+</dl>
 
 #### Example
 ##### Request:
