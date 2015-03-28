@@ -9,6 +9,7 @@ from models.user import User
 from models.backgroud_job import BackgroundJob
 from models.queue_item import QueueItem
 from models.poker_queue import enqueue
+from models.worker_request import WorkerRequest
 
 
 __all__ = [
@@ -21,4 +22,5 @@ __all__ = [
     'BackgroundJob',
     'QueueItem',
     'enqueue',
+    'WorkerRequest'
 ]
