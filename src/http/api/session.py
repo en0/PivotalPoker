@@ -19,7 +19,7 @@ class Session(ResourceBase):
     def put(self):
         json = request.get_json()
         new_session = models.Session.create(json=json)
-        new_session.player_id = new_session.uuid
+        new_session.player_id = str(new_session.uuid)
         if context.user:
             new_session.player_id = context.user.player_id
         session['user'] = new_session.__document__

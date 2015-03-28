@@ -1,4 +1,4 @@
 __author__ = 'ilaird'
 
 
-from http.api import session, game, tests
+from http.api import session, game, tests, jobs

@@ -1,16 +1,17 @@
 __author__ = 'en0'
 
+from http import context
 from uuid import uuid4
 import pickle
 from models.utils import _repr_from_keys
 
 
 class RedisDocument(object):
-    def __init__(self, uuid=None, db=None):
+    def __init__(self, uuid=None):
         self.__document__ = {}
-        self.__uuid__ = uuid
+        self.__uuid__ = str(uuid)
         self.__is_dirty__ = False
-        self.__db__ = db
+        self.__db__ = context.db
 
     def save(self):
         if self.__is_dirty__:
@@ -44,8 +45,8 @@ class RedisDocument(object):
         )
 
     @classmethod
-    def create(cls, json, db):
-        _ret = cls(uuid4(), db=db)
+    def create(cls, json):
+        _ret = cls(str(uuid4()))
         _ret.__is_dirty__ = True
         _ret.__document__ = _repr_from_keys(
             json,
@@ -55,8 +56,8 @@ class RedisDocument(object):
         return _ret
 
     @classmethod
-    def load(cls, uuid, db):
-        _ret = cls(uuid, db)
+    def load(cls, uuid):
+        _ret = cls(uuid)
         dat = _ret.__db__.hget(cls.__document_namespace__, uuid)
 
         if not dat:

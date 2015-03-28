@@ -1,6 +1,7 @@
 __author__ = 'en0'
 
 from models.redis_document import RedisDocumentFactory
+from http import context
 
 # To start a game -
 # Post a game with title, description, pts_scale, and password (optional)
@@ -40,7 +41,7 @@ GameBase = RedisDocumentFactory('PokerGame', [
 class Game(GameBase):
 
     @classmethod
-    def create(cls, owner_id, owner_name, json, db):
+    def create(cls, owner_id, owner_name, json):
         json['owner_id'] = owner_id
         json['owner_name'] = owner_name
         json['players'] = {}
@@ -48,13 +49,14 @@ class Game(GameBase):
         json['current_hand'] = None
         json['total_pts'] = 0
         json['state'] = 'Open'
-        super(Game, cls).create(json, db=db)
+        return super(Game, cls).create(json)
 
     @classmethod
-    def list(cls, db):
+    def list(cls):
+        _db = context.db
         _games = []
-        for game_id in db.hkeys(cls.__document_namespace__):
-            _game = super(Game, cls).load(game_id, db=db)
+        for game_id in _db.hkeys(cls.__document_namespace__):
+            _game = super(Game, cls).load(game_id)
             if _game.state == 'Open':
                 _games.append({
                     'title': _game.title,
@@ -72,7 +74,7 @@ class Game(GameBase):
 
     @property
     def private_entity(self):
-        _ret = super(Game, self).entity
+        _ret = super(Game, self).private_entity
         _ret['game_id'] = self.uuid
         return _ret
 

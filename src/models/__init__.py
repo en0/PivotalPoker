@@ -6,6 +6,9 @@ from models.hand import Hand
 from models.vote import Vote
 from models.result import Result
 from models.session import Session
+from models.backgroud_job import BackgroundJob
+from models.queue_item import QueueItem
+from models.poker_queue import enqueue
 
 
 __all__ = [
@@ -15,4 +18,7 @@ __all__ = [
     'Vote',
     'Result',
     'Session',
+    'BackgroundJob',
+    'QueueItem',
+    'enqueue',
 ]
