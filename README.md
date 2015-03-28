@@ -256,15 +256,15 @@ The full JSON format of a game resource.
     <dd>The accumulated points for this game. This value is dirived by adding accepted votes from each hand together.</dd>
 </dl>
 
-State Definitions:
-<dl>
-    <dt>Open</dt>
-    <dd>No hands are currently in play and new users can join at any time.</dd>
-    <dt>Playing</dt>
-    <dd>The game is currently in voting on a hand. No players can join at this time.</dd>
-    <dt>Reviewing</dt>
-    <dd>The game has finished a hand and is waiting on the owner to accept or reject the of the vote. No players can join at this time.</dd>
-</dl>
+> State Definitions:
+> <dl>
+>    <dt>Open</dt>
+>    <dd>No hands are currently in play and new users can join at any time.</dd>
+>    <dt>Playing</dt>
+>    <dd>The game is currently in voting on a hand. No players can join at this time.</dd>
+>    <dt>Reviewing</dt>
+>    <dd>The game has finished a hand and is waiting on the owner to accept or reject the of the vote. No players can join at this time.</dd>
+> </dl>
 
 #### Example
 ##### Request:
