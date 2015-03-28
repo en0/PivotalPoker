@@ -4,7 +4,7 @@ __author__ = 'en0'
 from flask import jsonify
 from http import app, context, session, ApiException
 from exts import Redis, RedisSessionInterface
-from models import Session
+from models import User
 
 
 redis = Redis(app)
@@ -16,7 +16,7 @@ def request_init():
     context.db = redis.connection
 
     if 'user' in session:
-        context.user = Session.load(session['user'])
+        context.user = User.load(session['user'])
     else:
         context.user = None
 
