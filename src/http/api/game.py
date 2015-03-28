@@ -42,7 +42,7 @@ class Game(ResourceBase):
         if _game is None:
             raise ApiException("Not Found", 404)
 
-        if _game.owner_id == context.user.player_id:
+        if str(_game.owner_id) == str(context.user.player_id):
             _game.delete()
         else:
             raise ApiException("Forbidden", 403)

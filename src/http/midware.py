@@ -16,7 +16,7 @@ def request_init():
     context.db = redis.connection
 
     if 'user' in session:
-        context.user = User.load(session['user'])
+        context.user = User.trusted_load(session['user'])
     else:
         context.user = None
 
