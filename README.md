@@ -110,6 +110,23 @@ Set-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21; HttpOnly; Path=/
 ### GET /api/v0.1/jobs/
 List currently queued items.
 
+The full JSON format of a job resource.
+
+```json
+{
+  "job_id": "07149d5d-0397-4057-bb7f-784d7023199d", 
+  "status": 202
+}
+```
+
+job_id
+
+The unique id of referring to a queued item.
+
+status
+
+The last known status of the queued item.
+
 #### Example
 ##### Request:
 ```http
@@ -143,10 +160,6 @@ Set-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21; HttpOnly; Path=/
 
 ```
 
-jobs
-
-A list of all recently queued items.
-
 ### GET /api/v0.1/jobs/{jobid}
 Retrieve queued item _jobid_.
 
@@ -179,75 +192,13 @@ Set-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21; HttpOnly; Path=/
 
 ```
 
-job_id
-
-The unique id of referring to a queued item.
-
-status
-
-The last known status of the queued item.
-
 ## Game
 ### POST /api/v0.1/game/
 Create a new game
 
-The full JSON format of a user resource.
+The full JSON format of a game resource.
 
 ```json
-{
-    "title": "Game",
-    "desc": "Some details about the game.",
-    "pts_scale": [1, 2, 3, 5, 8],
-    "password": "secret"
-}
-```
-
-title
-
-The public name of the game. This name will be visible to anyone.
-
-desc
-
-Optional, extra details about the game.
-
-pts_scale
-
-An array of integers used in voting for stories on this game.
-
-password
-
-Optional, a password to limit access to a given game.
-
-#### Example
-##### Request:
-```http
-POST /api/v0.1/game/ HTTP/1.1
-User-Agent: curl/7.41.0
-Host: localhost:5000
-Accept: */*
-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21
-Content-Type: application/json
-Content-Length: 88
-
-{
-    "title": "Game",
-    "desc": "This is a test game",
-    "pts_scale": [1, 2, 3, 5, 8]
-}
-
-```
-
-##### Response:
-```http
-HTTP/1.1 200 OK
-Server: gunicorn/19.2.1
-Date: Sat, 28 Mar 2015 17:38:05 GMT
-Connection: keep-alive
-Content-Type: application/json
-Content-Length: 376
-Location: http://localhost:5000/api/v0.1/game/7920c443-256c-4c67-a96f-df39d2c1b330
-Set-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21; HttpOnly; Path=/
-
 {
   "current_hand": null, 
   "desc": "This is a test game", 
@@ -257,13 +208,7 @@ Set-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21; HttpOnly; Path=/
   "owner_name": "Player Name", 
   "password": null, 
   "players": {}, 
-  "pts_scale": [
-    1, 
-    2, 
-    3, 
-    5, 
-    8
-  ], 
+  "pts_scale": [ 1,  2,  3,  5,  8 ], 
   "state": "Open", 
   "title": "Game", 
   "total_pts": 0
@@ -321,6 +266,59 @@ total_pts
 
 The accumulated points for this game. This value is dirived by adding accepted votes from each hand together.
 
+
+#### Example
+##### Request:
+```http
+POST /api/v0.1/game/ HTTP/1.1
+User-Agent: curl/7.41.0
+Host: localhost:5000
+Accept: */*
+Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21
+Content-Type: application/json
+Content-Length: 88
+
+{
+    "title": "Game",
+    "desc": "This is a test game",
+    "pts_scale": [1, 2, 3, 5, 8]
+}
+
+```
+
+##### Response:
+```http
+HTTP/1.1 200 OK
+Server: gunicorn/19.2.1
+Date: Sat, 28 Mar 2015 17:38:05 GMT
+Connection: keep-alive
+Content-Type: application/json
+Content-Length: 376
+Location: http://localhost:5000/api/v0.1/game/7920c443-256c-4c67-a96f-df39d2c1b330
+Set-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21; HttpOnly; Path=/
+
+{
+  "current_hand": null, 
+  "desc": "This is a test game", 
+  "game_id": "7920c443-256c-4c67-a96f-df39d2c1b330", 
+  "hands": [], 
+  "owner_id": "34c4a38d-51dc-4fd8-a5c7-d2ccb9ff004e", 
+  "owner_name": "Player Name", 
+  "password": null, 
+  "players": {}, 
+  "pts_scale": [
+    1, 
+    2, 
+    3, 
+    5, 
+    8
+  ], 
+  "state": "Open", 
+  "title": "Game", 
+  "total_pts": 0
+}
+```
+
 ### GET /api/v0.1/game/
 List open games.
 
@@ -358,22 +356,6 @@ Set-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21; HttpOnly; Path=/
 }
 
 ```
-
-game_id
-
-The system assigned game id used to interact with the game.
-
-has_password
-
-Value indicating if this game requires a password to join.
-
-owner_name
-
-The name of the person that created the game.
-
-title
-
-The publicly visible title of the game.
 
 ### GET /api/v0.1/game/{gameid}
 List the game _gameid_
@@ -420,49 +402,6 @@ Set-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21; HttpOnly; Path=/
 }
 ```
 
-current_hand
-
-Initially NULL, this field will hold a hand entity. The current hand is the hand that all votes will be applied.
-
-desc
-
-The details provided by the owner.
-
-game_id
-
-The system assigned game id used to interact with the game.
-
-hands
-
-Initially empty, the hands that have already been completed for this game.
-
-owner_name
-
-The player name of the person that created the game.
-
-players
-
-Initially empty, the currently enrolled players in the game.
-
-pts_scale
-
-The point scale used for casting votes on any hands for this game.
-
-state
-
-Initially _Open_, the current state of the game.
- - Open: No hands are currently in play and new users can join at any time.
- - Playing: The game is currently in voting on a hand. No players can join at this time.
- - Reviewing: The game has finished a hand and is waiting on the owner to accept or reject the of the vote. No players can join at this time.
- 
-title
-
-The publicly visible title of the game.
-
-total_pts
-
-The accumulated points for this game. This value is dirived by adding accepted votes from each hand together.
-
 ### DELETE /api/v0.1/game/{gameid}
 Destroy the game _gameid_
 
@@ -489,3 +428,54 @@ Content-Length: 0
 Set-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21; HttpOnly; Path=/
 
 ```
+
+## Hand
+### PUT /api/v0.1/hand/{gameid}
+Deal the hand for game _gameid_.
+
+The full JSON format of a hand resource.
+
+```json
+{
+    "body": "As a/an [actor], I should be able to [feature] so that i can [benefit]"
+}
+```
+
+#### Example
+##### Request:
+```http
+PUT /api/v0.1/hand/69d44d20-ea8a-4779-8d1f-e16e3e9b6de5 HTTP/1.1
+User-Agent: curl/7.41.0
+Host: localhost:5000
+Accept: */*
+Cookie: session=f30d43c5-cc20-4900-a1a1-f12f135d2fdf
+Content-Type: application/json
+Content-Length: 87
+
+{
+    "body": "As a/an [actor], I should be able to [feature] so that I can [benefit]."
+}
+
+```
+
+##### Response:
+```http
+HTTP/1.1 202 ACCEPTED
+Server: gunicorn/19.2.1
+Date: Sat, 28 Mar 2015 21:45:14 GMT
+Connection: keep-alive
+Content-Type: application/json
+Content-Length: 72
+Set-Cookie: session=f30d43c5-cc20-4900-a1a1-f12f135d2fdf; HttpOnly; Path=/
+
+{
+  "job_id": "0302b029-2f8d-481e-b51a-b62066cbb943", 
+  "status": 202
+}
+
+```
+
+### DELETE /api/v0.1/hand/{gameid}
+Destroy hand for game _gameid_.
+
+__TO DO__
