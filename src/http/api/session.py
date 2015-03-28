@@ -18,10 +18,10 @@ class Session(ResourceBase):
 
     def put(self):
         json = request.get_json()
-        new_session = models.User.load(json=json)
+        new_session = models.User(json=json)
         if context.user:
             new_session.player_id = context.user.player_id
-        session['user'] = new_session.__document__
+        new_session.apply()
         return None, 201, {'Location': '/api/v0.1/session'}
 
 register_route(Session, app)

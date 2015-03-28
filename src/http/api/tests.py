@@ -15,11 +15,7 @@ class Tests(ResourceBase):
     def get(self, some_id=None):
         """ Just testing the queueing idea """
         if not some_id: return {}
-        return models.QueueItem.load({
-            'queue': 'join',
-            'queue_id': some_id,
-            'data': context.user.__document__
-        })
+        return models.QueueItem(some_id, context.user)
 
     def post(self, some_id=None):
         return {}

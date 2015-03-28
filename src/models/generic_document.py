@@ -4,8 +4,19 @@ from models.utils import _repr_from_keys
 
 
 class GenericDocument(object):
-    def __init__(self):
+    def __init__(self, json=None, document=None):
         self.__document__ = {}
+        if document:
+            self.__document__ = document
+        elif json:
+            self.__document__ = _repr_from_keys(
+                json,
+                self.__required_fields__,
+                self.__optional_fields__
+            )
+        else:
+            raise KeyError()
+
 
     @property
     def entity(self):
@@ -22,22 +33,6 @@ class GenericDocument(object):
             fields=self.__required_fields__,
             optional_fields=self.__optional_fields__
         )
-        return _ret
-
-    @classmethod
-    def load(cls, json):
-        _ret = cls()
-        _ret.__document__ = _repr_from_keys(
-            json,
-            cls.__required_fields__,
-            cls.__optional_fields__
-        )
-        return _ret
-
-    @classmethod
-    def trusted_load(cls, json):
-        _ret = cls()
-        _ret.__document__ = json
         return _ret
 
 
@@ -59,6 +54,7 @@ def GenericDocumentFactory(namespace, fields):
     """
 
     _def = {
+        '__document_namespace__': namespace,
         '__required_fields__': [],
         '__optional_fields__': [],
         '__public_fields__': [],

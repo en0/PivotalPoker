@@ -14,11 +14,8 @@ app.session_interface = RedisSessionInterface(redis.connect())
 @app.before_request
 def request_init():
     context.db = redis.connection
+    context.user = User.current()
 
-    if 'user' in session:
-        context.user = User.trusted_load(session['user'])
-    else:
-        context.user = None
 
 @app.errorhandler(ApiException)
 def api_exception(error):
