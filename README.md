@@ -491,7 +491,7 @@ The full JSON format of a player resource.
 ```json
 {
     "player_id": "feea0a8f-153a-442f-87f8-645fe647bcdf",
-    "name": "Player Name".
+    "name": "Player Name",
     "password": null
 }
 ```
