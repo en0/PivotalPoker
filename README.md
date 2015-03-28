@@ -9,6 +9,9 @@ gunicorn -k gevent -b IP:PORT run:app
 * Session
   * PUT /api/v0.1/session: Start user session.
   * GET /api/v0.1/session: Retrieve user session.
+* Job
+  * GET /api/v0.1/jobs/: List currently queued items.
+  * GET /api/v0.1/jobs/{jobid}: Retrieve queued item _jobid_.
 * Game
   * POST /api/v0.1/game/: Create a new game.
   * GET /api/v0.1/game/: List open games.
@@ -102,6 +105,87 @@ Set-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21; HttpOnly; Path=/
 }
 
 ```
+
+## Job
+### GET /api/v0.1/jobs/
+List currently queued items.
+
+#### Example
+##### Request:
+```http
+GET /api/v0.1/jobs/ HTTP/1.1
+User-Agent: curl/7.41.0
+Host: localhost:5000
+Accept: */*
+Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21
+Content-Type: application/json
+
+```
+
+##### Response:
+```http
+HTTP/1.1 200 OK
+Server: gunicorn/19.2.1
+Date: Sat, 28 Mar 2015 18:35:10 GMT
+Connection: keep-alive
+Content-Type: application/json
+Content-Length: 108
+Set-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21; HttpOnly; Path=/
+
+{
+  "jobs": [
+    {
+      "job_id": "07149d5d-0397-4057-bb7f-784d7023199d", 
+      "status": 202
+    }
+  ]
+}
+
+```
+
+jobs
+
+A list of all recently queued items.
+
+### GET /api/v0.1/jobs/{jobid}
+Retrieve queued item _jobid_.
+
+#### Example
+##### Request:
+```http
+GET /api/v0.1/jobs/07149d5d-0397-4057-bb7f-784d7023199d HTTP/1.1
+User-Agent: curl/7.41.0
+Host: localhost:5000
+Accept: */*
+Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21
+Content-Type: application/json
+
+```
+
+##### Response:
+```http
+HTTP/1.1 200 OK
+Server: gunicorn/19.2.1
+Date: Sat, 28 Mar 2015 18:37:12 GMT
+Connection: keep-alive
+Content-Type: application/json
+Content-Length: 72
+Set-Cookie: session=9626aa1a-3902-44ed-915c-b3e48f8d7a21; HttpOnly; Path=/
+
+{
+  "job_id": "07149d5d-0397-4057-bb7f-784d7023199d", 
+  "status": 202
+}
+
+```
+
+job_id
+
+The unique id of referring to a queued item.
+
+status
+
+The last known status of the queued item.
 
 ## Game
 ### POST /api/v0.1/game/
