@@ -57,7 +57,7 @@ app.controller('homeCtrl', ['$scope', 'poker-api', function($scope, api) {
     };
 
     $scope.createGame = function() {
-
+        console.log($scope.game)
     };
 }]);
 
