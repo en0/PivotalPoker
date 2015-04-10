@@ -22,6 +22,6 @@ class Session(ResourceBase):
         if context.user:
             new_session.player_id = context.user.player_id
         new_session.apply()
-        return None, 201, {'Location': '/api/v0.1/session'}
+        return None, 201, {'Location': Session.__uri__}
 
 register_route(Session, app)

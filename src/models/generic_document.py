@@ -15,7 +15,7 @@ class GenericDocument(object):
                 self.__optional_fields__
             )
         else:
-            raise KeyError()
+            raise KeyError("Empty Document")
 
 
     @property

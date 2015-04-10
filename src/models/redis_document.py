@@ -73,23 +73,6 @@ class RedisDocument(object):
 
 
 def RedisDocumentFactory(namespace, fields, serializer=None):
-    """ Create a RedisDocument class with the given fields
-
-    The field argument has some structure.
-
-    Example:
-    [
-        # Field Name    Required    Public
-        ('field1',      True,       True),
-        ('field2',      False,      True),
-        ('field3',      True,       False),
-    ]
-
-    :param namespace: The namespace to store this type of document under.
-    :param fields: Fields that this document holds.
-    :param serializer: The type of serialization to use. (default: pickle)
-    :return: A class that can create objects of this type.
-    """
 
     _def = {
         '__document_namespace__': namespace,

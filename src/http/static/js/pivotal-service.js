@@ -7,6 +7,7 @@ angular.module('theApp')
         var _ret = {};
 
         _ret.login = function(username, password) {
+            // testing
             var def = $q.defer();
 
             $http.get(urlBase + "/me")
@@ -21,4 +22,5 @@ angular.module('theApp')
         }
 
         return _ret;
-    }])
+    }]);
+

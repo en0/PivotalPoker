@@ -3,6 +3,7 @@ __author__ = 'en0'
 from flask import copy_current_request_context
 from http import app, request, context, ApiException
 from http.api.resource_base import ResourceBase, register_route
+from utils import require_session
 import gevent
 import models
 import worker
@@ -24,10 +25,11 @@ class Game(ResourceBase):
             _ret = dict(games=models.Game.list())
         return _ret
 
+    @require_session
     def post(self):
         _game = models.Game.create(context.user.player_id, context.user.name, request.get_json())
-        _worker = worker.Game(_game.uuid)
         _game.save()
+        _worker = worker.Game(_game.uuid)
 
         @copy_current_request_context
         def task():

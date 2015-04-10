@@ -1,0 +1,12 @@
+<table class="table">
+    <tr>
+        <th>Game Name</th>
+        <th>Owner</th>
+        <th></th>
+    </tr>
+    <tr ng-repeat="j in games">
+        <td>[[ j.title ]]</td>
+        <td>[[ j.owner_name ]]</td>
+        <td><button class="btn btn-xs btn-primary" ng-click="joinGame(j.game_id)">&nbsp;Join&nbsp;</button></td>
+    </tr>
+</table>

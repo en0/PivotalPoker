@@ -7,6 +7,7 @@ from http import context
 BackgroundJobBase = RedisDocumentFactory('jobs', [
     # Name, Req, Pub
     ('status', True, True),
+    ('message', False, True)
 ])
 
 

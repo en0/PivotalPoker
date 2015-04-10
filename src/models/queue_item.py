@@ -2,6 +2,7 @@ __author__ = 'en0'
 
 
 from models.generic_document import GenericDocumentFactory
+import models
 
 
 QueueItemBase = GenericDocumentFactory('QueueItem', [
@@ -14,6 +15,7 @@ QueueItemBase = GenericDocumentFactory('QueueItem', [
 
 class QueueItem(QueueItemBase):
     def __init__(self, queue_id=None, entity=None, document=None):
+        self._job = None
         if document:
             _json = None
         elif queue_id is None:
@@ -28,3 +30,13 @@ class QueueItem(QueueItemBase):
             }
 
         super(QueueItem, self).__init__(json=_json, document=document)
+
+    def set_job_status(self, status, message=None):
+        if self._job is None:
+            self._job = models.BackgroundJob.load(self.job_id)
+        if self._job:
+            self._job.status = status
+            self._job.message = message
+            self._job.save()
+            return True
+        return False
