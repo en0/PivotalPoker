@@ -15,33 +15,6 @@
         </table>
     </div>
     <div class="col-md-6">
-        <form>
-            <h2>Create Game</h2>
-            <div class="form-group">
-                <label for="title">Title:</label>
-                <input id="title" type="text" ng-model="game.title" class="form-control" placeholder="Name of the Game" />
-            </div>
-            <div class="form-group">
-                <label for="desc">Description:</label>
-                <input id="desc" type="text" ng-model="game.desc" class="form-control" placeholder="(Optional) Extra comments about this game." />
-            </div>
-            <div class="form-group">
-                <label for="point_scale">Point Scale:</label>
-                <select id="point_scale" ng-model="game.pts_scale_select" class="form-control">
-                    <option value="seq">Counting</option>
-                    <option value="fib">Fibonacci</option>
-                    <option value="lp">Lucas Primes</option>
-                    <option value="pow">Powers of Two</option>
-                    <option value="custom">Custom Set</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="pwd">Password:</label>
-                <input id="pwd" type="password" ng-model="game.password" class="form-control" placeholder="(Optional) A password to join the game." />
-            </div>
-            <div class="form-group">
-                <button type="button" class="btn btn-default" ng-click="createGame()">Create Game</button>
-            </div>
-        </form>
+        <button class="btn btn-default" ng-click="showCreateGameModal()">Create Game</button>
     </div>
 </div>

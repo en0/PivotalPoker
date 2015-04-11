@@ -44,7 +44,7 @@ app.controller('rootCtrl', ['$rootScope', '$location', '$modal', 'poker-api', fu
 
 }]);
 
-app.controller('homeCtrl', ['$scope', 'poker-api', function($scope, api) {
+app.controller('homeCtrl', ['$scope', '$modal', 'poker-api', function($scope, $modal, api) {
     document.title = 'Dashboard';
     api.listGames().then(function(games) {
         $scope.games = games.games;
@@ -56,8 +56,14 @@ app.controller('homeCtrl', ['$scope', 'poker-api', function($scope, api) {
         console.log(game_id);
     };
 
-    $scope.createGame = function() {
-        console.log($scope.game)
+    $scope.showCreateGameModal = function() {
+
+        var modalInst = $modal.open({
+            templateUrl: 'partials/createGame_modal.html',
+            controller: 'createGameCtrl',
+        }).result.then(function(game) {
+            console.log(game);
+        });
     };
 }]);
 
@@ -89,3 +95,66 @@ app.controller('registerCtrl', ['$scope', '$modalInstance', 'poker-api', functio
 
 }]);
 
+app.controller('createGameCtrl', ['$scope', '$modalInstance', 'poker-api', function($scope, $modalInstance, api) {
+    $scope.form_alerts = [];
+    $scope.ok = function() {
+
+        // Needs form validation.
+        var game = {
+            title: $scope.game.title,
+            desc: $scope.game.desc,
+            pts_scale: POINTSCALES[$scope.game.pts_scale_select].gen($scope.game.pts_scale_len),
+        }
+
+        // Add the password if it was set.
+        if($scope.game.password) {
+            game.password = $scope.game.password;
+        }
+
+        $modalInstance.close(game);
+    };
+
+    $scope.cancel = function() {
+        $modalInstance.dismiss('cancel');
+    };
+
+    // Create a custom sequence using the custom sequence input box.
+    createCustomPointScale("__custom__", "Custom Sequence", function(count) {
+
+        // Convert custom set to a list. Strip whitespace and split on comma
+        var _set = $scope.game.custom_pts_scale.replace(/ /g,'').split(',');
+        var _ret = [];
+
+        // We are ignoring "count" on custom lists so just go through every element.
+        for(var i = 0; i < _set.length; i++) {
+            // Convert the value to a number. this will support ints, floats, and doubles
+            _ret[i] = Number(_set[i]);
+
+            // Validate the element was a number.
+            // If it is not, add a form validation alert.
+            if(isNaN(_ret[i])) {
+                _ret = [];
+                console.log('Add alert to form');
+                break;
+            }
+        }
+
+        return _ret;
+    });
+
+    // Add the canned sequences to the point scale selection list.
+    var i = 0;
+    $scope.PointScaleOptions = []
+    for(var s in POINTSCALES) {
+        $scope.PointScaleOptions[i++] = {
+            name: POINTSCALES[s].name,
+            value: s
+        };
+    }
+
+    // Create Game Presets
+    $scope.game = {
+        pts_scale_select: "count",
+        pts_scale_len: 5
+    };
+}]);

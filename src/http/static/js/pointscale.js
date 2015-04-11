@@ -1,5 +1,14 @@
 'use strict'
 
+function isPrime(n) {
+    if (n <= 3) { return n > 1; }
+    if (n % 2 == 0 || n % 3 == 0) { return false; }
+    for (var  i = 5; i * i <= n; i += 6) {
+        if (n % i == 0 || n % (i + 2) == 0) { return false; }
+    }
+    return true;
+}
+
 var POINTSCALES = {}
 
 POINTSCALES.count = {
@@ -33,10 +42,24 @@ POINTSCALES.fibonacci = {
 POINTSCALES.lp = {
     name: "Lucas Primes",
     gen: function(count) {
+
+        var prev = 2;
+        var curr = 1;
         var _ret = [];
-        for(var i = 0; i < count; i++)
-            /* someting */
-            _ret = _ret;
+
+        for(var i = 0; i < count; ) {
+            if(isPrime(curr)) {
+                _ret[i] = curr;
+                i+=1;
+            }
+            curr += prev;
+            prev = curr - prev;
+
+            // Limit to 10 entries to avoid blocking
+            if(i > 9)
+                i = count;
+        }
+
         return _ret;
     }
 };
@@ -52,6 +75,13 @@ POINTSCALES.powers = {
         }
         return _ret;
     }
+};
+
+function createCustomPointScale(alias, name, gen) {
+    POINTSCALES[alias] = {
+        name: name,
+        gen: gen
+    };
 };
 
 var PointScale = function(algo, count) {
