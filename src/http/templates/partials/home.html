@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-12">
         <h2>Open Games</h2>
         <table class="table">
             <tr>
@@ -10,11 +10,9 @@
             <tr ng-repeat="j in games">
                 <td>[[ j.title ]]</td>
                 <td>[[ j.owner_name ]]</td>
-                <td><button class="btn btn-xs btn-primary" ng-click="joinGame(j.game_id)">&nbsp;Join&nbsp;</button></td>
+                <td><button class="btn btn-xs btn-primary pull-right" ng-click="joinGame(j.game_id)">&nbsp;Join&nbsp;</button></td>
             </tr>
         </table>
-    </div>
-    <div class="col-md-6">
-        <button class="btn btn-default" ng-click="showCreateGameModal()">Create Game</button>
+        <button class="btn btn-primary pull-right" ng-click="showCreateGameModal()">Create Game</button>
     </div>
 </div>

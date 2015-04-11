@@ -62,7 +62,14 @@ app.controller('homeCtrl', ['$scope', '$modal', 'poker-api', function($scope, $m
             templateUrl: 'partials/createGame_modal.html',
             controller: 'createGameCtrl',
         }).result.then(function(game) {
-            console.log(game);
+            api.createGame(game)
+            .then(function(data) {
+                $scope.games.push(data);
+                console.log(data);
+            })
+            .catch(function(error) {
+                // Notify an error
+            });
         });
     };
 }]);
@@ -95,7 +102,7 @@ app.controller('registerCtrl', ['$scope', '$modalInstance', 'poker-api', functio
 
 }]);
 
-app.controller('createGameCtrl', ['$scope', '$modalInstance', 'poker-api', function($scope, $modalInstance, api) {
+app.controller('createGameCtrl', ['$scope', '$modalInstance', function($scope, $modalInstance) {
     $scope.form_alerts = [];
     $scope.ok = function() {
 

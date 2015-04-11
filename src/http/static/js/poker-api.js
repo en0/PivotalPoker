@@ -50,13 +50,31 @@ angular.module('theApp')
              *  On error, { message: MESSAGE, status_code: STATUS_CODE }
              */
             var def = $q.defer();
-
             $http.get(urlBase+"/game/")
             .success(function(data) { def.resolve(data); })
             .error(function(response, code) { def.reject(response); });
-
             return def.promise;
         };
+
+        _ret.createGame = function(game) {
+            /* POST /api/v0.1/game/ : Create a new game.
+             *
+             * Arguments: (as obj)
+             *  title : The title of the game.
+             *  desc : The description for the game.
+             *  pts_scale : An array of values used as the point scales for the game.
+             *  password : (Optional) A password used to join the game.
+             *
+             * Returns: (as promise)
+             *  On success, Game Entity { ... }
+             *  On error, { message: MESSAGE, status_code: STATUS_CODE }
+             */
+             var def = $q.defer();
+             $http.post(urlBase+'/game/', game)
+            .success(function(data) { def.resolve(data); })
+            .error(function(response, code) { def.reject(response); });
+            return def.promise;
+        }
 
         return _ret;
 
