@@ -16,7 +16,11 @@ app.controller('rootCtrl', ['$rootScope', '$location', '$modal', 'poker-api', fu
         api.me()
 
         // If the session exists, set the name
-        .then(function(data) {  $rootScope.displayName = data.name; })
+        .then(function(data) {
+            $rootScope.playerId = data.player_id;
+            $rootScope.displayName = data.name;
+            console.log(data);
+        })
 
         // Some error occurred. Possibly no session.
         .catch(function(error) {
@@ -76,7 +80,7 @@ app.controller('homeCtrl', ['$scope', '$modal', 'poker-api', function($scope, $m
                     message: function () { return "Joining Game..."; },
                     jobId: function() { return job.job_id; }
                 }
-            }).then(function(data) {
+            }).result.then(function(data) {
                 $scope.go('/play/'+gameId);
             });
 
@@ -136,6 +140,14 @@ app.controller('homeCtrl', ['$scope', '$modal', 'poker-api', function($scope, $m
 app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($scope, $routeParams, api) {
     console.log($routeParams.gameId);
     $scope.gameId = $routeParams.gameId;
+
+    $scope.leaveGame = function() {
+        api.leaveGame($scope.gameId, $scope.playerId).then(function(data) {
+            console.log(data);
+        })
+        console.log($scope.playerId)
+        console.log("ok")
+    }
 
     function _updateGame() {
         // Make sure that the modal is still open.

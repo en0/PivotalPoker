@@ -84,9 +84,11 @@ class Game(GameBase):
         if not self.__document__['players']:
             self.__document__['players'] = {}
         self.__document__['players'][player_id] = name
+        self.__is_dirty__ = True
 
     def remove_player(self, player_id):
         if not self.__document__['players']:
             self.__document__['players'] = {}
         if player_id in self.__document__['players']:
             del self.__document__['players'][player_id]
+            self.__is_dirty__ = True

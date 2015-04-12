@@ -111,6 +111,24 @@ angular.module('theApp')
             return def.promise;
         }
 
+        _ret.leaveGame = function(gameId, playerId) {
+            /* DELETE /api/v0.1/player/:gameId/:playerId : Remove a player from the game.
+             *
+             * Arguments:
+             *  gameId : The game in question.
+             *  playerId : The player to remove from the game.
+             *
+             * Returns: (as promise)
+             *  On success, Enqueue Job Entity { ... }
+             *  On error, { message: MESSAGE, status_code: STATUS_CODE }
+             */
+             var def = $q.defer();
+             $http.delete(urlBase+'/player/'+gameId+"/"+playerId)
+            .success(function(data) { def.resolve(data); })
+            .error(function(response, code) { def.reject(response); });
+            return def.promise;
+        }
+
         _ret.getJobStatus = function(jobId) {
             /* GET /api/v0.1/jobs/:jobId : Retrieve queued item, jobId
              *

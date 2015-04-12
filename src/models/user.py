@@ -6,7 +6,7 @@ from uuid import uuid4
 
 UserBase = GenericDocumentFactory("User", [
     # Name,       Req,   Pub
-    ('player_id', False,  False),
+    ('player_id', False,  True),
     ('name',      True,  True)
 ])
 

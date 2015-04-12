@@ -14,8 +14,9 @@ QueueItemBase = GenericDocumentFactory('QueueItem', [
 
 
 class QueueItem(QueueItemBase):
-    def __init__(self, queue_id=None, entity=None, document=None):
+    def __init__(self, queue_id=None, entity=None, document=None, db=None):
         self._job = None
+        self._db = db
         if document:
             _json = None
         elif queue_id is None:
@@ -33,7 +34,8 @@ class QueueItem(QueueItemBase):
 
     def set_job_status(self, status, message=None):
         if self._job is None:
-            self._job = models.BackgroundJob.load(self.job_id)
+            self._job = models.BackgroundJob.load(self.job_id, db=self._db)
+
         if self._job:
             self._job.status = status
             self._job.message = message

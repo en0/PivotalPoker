@@ -17,20 +17,15 @@ class Player(ResourceBase):
         _game = models.Game.load(game_id, db=context.db)
         if not _game:
             raise ApiException('Not Found', 404)
-        elif _game.state != 'Open':
-            raise ApiException('Conflict', 409)
 
         _player = models.Player(context.user.player_id, context.user.name, request.get_json())
         return models.QueueItem(game_id, _player)
 
     @utils.enqueue
     def delete(self, game_id, player_id):
-        raise NotImplementedError("Untestable without worker thread")
         _game = models.Game.load(game_id, db=context.db)
         if not _game:
             raise ApiException('Not Found', 404)
-        elif player_id != context.user.player_id and player_id != _game.owner_id:
-            raise ApiException('forbidden', 403)
 
         _request = models.WorkerRequest({
             'request_by': context.user.player_id,
