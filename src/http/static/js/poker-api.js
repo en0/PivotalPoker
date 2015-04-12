@@ -56,6 +56,23 @@ angular.module('theApp')
             return def.promise;
         };
 
+        _ret.getGame = function(gameId) {
+            /* GET /api/v0.1/game/:gameId : Retrieve the details of game, gameId
+             *
+             * Arguments:
+             *  gameId : The unique identifier for the game.
+             *
+             * Returns: (as promise)
+             *  On success, Game Entity { ... }
+             *  On error, { message: MESSAGE, status_code: STATUS_CODE }
+             */
+             var def = $q.defer();
+             $http.get(urlBase+'/game/'+gameId)
+            .success(function(data) { def.resolve(data); })
+            .error(function(response, code) { def.reject(response); });
+            return def.promise;
+        };
+
         _ret.createGame = function(game) {
             /* POST /api/v0.1/game/ : Create a new game.
              *
@@ -71,6 +88,41 @@ angular.module('theApp')
              */
              var def = $q.defer();
              $http.post(urlBase+'/game/', game)
+            .success(function(data) { def.resolve(data); })
+            .error(function(response, code) { def.reject(response); });
+            return def.promise;
+        }
+
+        _ret.joinGame = function(gameId, password) {
+            /* POST /api/v0.1/player/:gameId : Join the game, gameId.
+             *
+             * Arguments:
+             *  gameId : The game to join.
+             *  password : (If Required) A password to join the game.
+             *
+             * Returns: (as promise)
+             *  On success, Enqueue Job Entity { ... }
+             *  On error, { message: MESSAGE, status_code: STATUS_CODE }
+             */
+             var def = $q.defer();
+             $http.post(urlBase+'/player/'+gameId+"/", { 'password': password })
+            .success(function(data) { def.resolve(data); })
+            .error(function(response, code) { def.reject(response); });
+            return def.promise;
+        }
+
+        _ret.getJobStatus = function(jobId) {
+            /* GET /api/v0.1/jobs/:jobId : Retrieve queued item, jobId
+             *
+             * Arguments:
+             *  jobId : The job id.
+             *
+             * Returns: (as promise)
+             *  On success, Enqueue Job Entity { ... }
+             *  On error, { message: MESSAGE, status_code: STATUS_CODE }
+             */
+             var def = $q.defer();
+             $http.get(urlBase+'/jobs/'+jobId)
             .success(function(data) { def.resolve(data); })
             .error(function(response, code) { def.reject(response); });
             return def.promise;

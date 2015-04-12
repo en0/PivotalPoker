@@ -45,33 +45,116 @@ app.controller('rootCtrl', ['$rootScope', '$location', '$modal', 'poker-api', fu
 }]);
 
 app.controller('homeCtrl', ['$scope', '$modal', 'poker-api', function($scope, $modal, api) {
-    document.title = 'Dashboard';
+    document.title = 'Planning Poker';
     api.listGames().then(function(games) {
         $scope.games = games.games;
         console.log(games.games);
     });
 
-    $scope.joinGame = function(game_id) {
-        // remember to check for password
-        console.log(game_id);
+    function _joinGame(gameId, password) {
+        /* Join the game, gameId, with the supplied password
+         * We will submit the join request to the player route
+         * we expect a queued job id in response.
+         * After that we will use the job status modal to wait for the job to complete.
+         * then we need to dispatch to the playing route.
+         */
+        console.log("Joining game: " + gameId);
+        console.log("With password: " + password);
+
+        api.joinGame(gameId, password)
+        .then(function(job) {
+            // Expect a queued Job in response.
+            console.log("Jobid: ");
+            console.log(job);
+
+            // Show the job status in the jobStatus modal.
+            $modal.open({
+                templateUrl: 'partials/jobStatus_modal.html',
+                controller: 'jobStatusCtrl',
+                size: 'sm',
+                resolve: {
+                    message: function () { return "Joining Game..."; },
+                    jobId: function() { return job.job_id; }
+                }
+            }).then(function(data) {
+                $scope.go('/play/'+gameId);
+            });
+
+        })
+        .catch(function(error) {
+            console.log(error);
+            console.log("Should probably pop a error message here.")
+        });
+
+    }
+
+    $scope.joinGame = function(gameId, hasPassword) {
+        console.log(gameId);
+        console.log(hasPassword);
+
+        // Some games require a joiner password. If so, prompt the user to enter it.
+        if(hasPassword) {
+            $modal.open({
+                templateUrl: 'partials/passwordPrompt_modal.html',
+                controller: 'promptCtrl',
+                size: 'sm'
+            })
+            .result.then(function(pass) {
+                _joinGame(gameId, pass);
+            });
+        } else {
+            _joinGame(gameId, null);
+        }
     };
 
     $scope.showCreateGameModal = function() {
+
+        // Create a new game using the NewGame modal.
+        // We will prompt for all the data from NewGame modal then create the game in this method.
 
         var modalInst = $modal.open({
             templateUrl: 'partials/createGame_modal.html',
             controller: 'createGameCtrl',
         }).result.then(function(game) {
+            // Create the game using the provided details.
+            // On success, add the game to the list of available games.
             api.createGame(game)
             .then(function(data) {
                 $scope.games.push(data);
                 console.log(data);
+                console.log("This should probably just go to the game control window.")
             })
             .catch(function(error) {
                 // Notify an error
+                console.log(error);
+                console.log("Should pop a error message here.")
             });
         });
     };
+}]);
+
+app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($scope, $routeParams, api) {
+    console.log($routeParams.gameId);
+    $scope.gameId = $routeParams.gameId;
+
+    function _updateGame() {
+        // Make sure that the modal is still open.
+        if($scope.$$destroyed === true) return;
+
+        api.getGame($scope.gameId)
+        .then(function(game) {
+            $scope.game = game;
+            $scope.debug = JSON.stringify(game);
+            console.log(game);
+            window.setTimeout(_updateGame, 3000);
+        })
+        .catch(function(error) {
+            console.log(error);
+            console.log("Show error about issue");
+        });
+    }
+
+    _updateGame();
 }]);
 
 app.controller('aboutCtrl', ['$scope', function($scope) {
@@ -164,4 +247,51 @@ app.controller('createGameCtrl', ['$scope', '$modalInstance', function($scope, $
         pts_scale_select: "count",
         pts_scale_len: 5
     };
+}]);
+
+app.controller('promptCtrl', ['$scope', '$modalInstance', function($scope, $modalInstance) {
+    $scope.ok = function() { $modalInstance.close($scope.value); };
+    $scope.cancel = function() { $modalInstance.dismiss('cancel'); };
+}]);
+
+app.controller('jobStatusCtrl', ['$scope', '$modalInstance', 'poker-api', 'message', 'jobId', function($scope, $modalInstance, api, message, jobId) {
+    // Display the message on the status page.
+    $scope.message = message;
+
+    // This is used so timeout can close the modal.
+    function complete() {
+        $modalInstance.close("success");
+    }
+
+    function long_pull() {
+
+        // Make sure that the modal is still open.
+        if($scope.$$destroyed === true) return;
+
+        // Get the current statue of the job we are waiting for.
+        api.getJobStatus(jobId)
+        .then(function(result) {
+            // All jobs are "done" when status code is 200.
+            // Otherwise they are still pending.
+            if(result.status == 200) {
+                $scope.message = result.message
+                window.setTimeout(complete, 3000);
+            } else {
+                // Update the message if one is available.
+                if(result.message !== null)
+                    $scope.message = result.message;
+
+                // Wait 1 second and check again.
+                window.setTimeout(long_pull, 1000);
+                console.log(result);
+            }
+        })
+        .catch(function(error) {
+            console.log(error);
+            console.log("Should show the error on the status modal.")
+        });
+    }
+
+    // Start checking the job's status.
+    long_pull();
 }]);
