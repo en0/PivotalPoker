@@ -22,7 +22,7 @@ def enqueue(fn):
         assert isinstance(_db, Redis)
 
         # Create a background entry to track this enqueue item
-        _job = models.BackgroundJob.create(202)
+        _job = models.BackgroundJob.create(202, db=_db)
         queue_item.job_id = _job.job_id
         _db.lpush(_key, pickle.dumps(queue_item.__document__))
 

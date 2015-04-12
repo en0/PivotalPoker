@@ -2,7 +2,7 @@ __author__ = 'en0'
 
 from http import app, request, session, context, ApiException
 from http.api.resource_base import ResourceBase, register_route
-import models
+from models.user import User
 
 
 class Session(ResourceBase):
@@ -18,7 +18,7 @@ class Session(ResourceBase):
 
     def put(self):
         json = request.get_json()
-        new_session = models.User(json=json)
+        new_session = User(json=json)
         if context.user:
             new_session.player_id = context.user.player_id
         new_session.apply()

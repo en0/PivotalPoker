@@ -1,6 +1,6 @@
 __author__ = 'en0'
 
-from http import app
+from http import app, context
 from exts.exceptions import ApiException
 from http.api.resource_base import ResourceBase, register_route
 import models
@@ -14,12 +14,12 @@ class Jobs(ResourceBase):
 
     def get(self, job_id=None):
         if job_id:
-            _job = models.BackgroundJob.load(uuid=job_id)
+            _job = models.BackgroundJob.load(uuid=job_id, db=context.db)
             if _job is None:
                 raise ApiException("Not Found", 404)
             _ret = _job.entity
         else:
-            _ret = dict(jobs=models.BackgroundJob.list())
+            _ret = dict(jobs=models.BackgroundJob.list(db=context.db))
         return _ret
 
 

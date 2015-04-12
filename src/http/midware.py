@@ -4,7 +4,7 @@ __author__ = 'en0'
 from flask import jsonify
 from http import app, context, session, ApiException
 from exts import Redis, RedisSessionInterface
-from models import User
+from models.user import User
 
 
 redis = Redis(app)

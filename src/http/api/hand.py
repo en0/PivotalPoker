@@ -3,6 +3,7 @@ __author__ = 'en0'
 from http import app, ApiException, context, request
 from http.api.resource_base import ResourceBase, register_route
 import models
+import utils
 
 
 class Hand(ResourceBase):
@@ -11,9 +12,9 @@ class Hand(ResourceBase):
     __pk_type__ = 'string'
     __method_hints__ = ['PUT', 'DELETE']
 
-    @models.enqueue
+    @utils.enqueue
     def put(self, game_id):
-        _game = models.Game.load(game_id)
+        _game = models.Game.load(game_id, db=context.db)
         if not _game:
             raise ApiException('Not Found', 404)
         elif _game.owner_id != context.user.player_id:
@@ -24,10 +25,10 @@ class Hand(ResourceBase):
         _hand = models.Hand(request.get_json())
         return models.QueueItem(game_id, _hand)
 
-    @models.enqueue
+    @utils.enqueue
     def delete(self, game_id):
         raise NotImplementedError("Untestable without worker thread")
-        _game = models.Game.load(game_id)
+        _game = models.Game.load(game_id, db=context.db)
         if not _game:
             raise ApiException('Not Found', 404)
         elif _game.owner_id != context.user.player_id:

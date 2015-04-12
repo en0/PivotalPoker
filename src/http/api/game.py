@@ -17,29 +17,22 @@ class Game(ResourceBase):
 
     def get(self, game_id=None):
         if game_id:
-            _game = models.Game.load(uuid=game_id)
+            _game = models.Game.load(uuid=game_id, db=context.db)
             if _game is None:
                 raise ApiException("Not Found", 404)
             _ret = _game.entity
         else:
-            _ret = dict(games=models.Game.list())
+            _ret = dict(games=models.Game.list(db=context.db))
         return _ret
 
     @require_session
     def post(self):
-        _game = models.Game.create(context.user.player_id, context.user.name, request.get_json())
+        _game = models.Game.create(context.user.player_id, context.user.name, request.get_json(), db=context.db)
         _game.save()
-        _worker = worker.Game(_game.uuid)
-
-        @copy_current_request_context
-        def task():
-            _worker()
-
-        gevent.spawn(task)
         return _game.private_entity, 200, {'Location': '/api/v0.1/game/{0}'.format(_game.uuid)}
 
     def delete(self, game_id):
-        _game = models.Game.load(uuid=game_id)
+        _game = models.Game.load(uuid=game_id, db=context.db)
 
         if _game is None:
             raise ApiException("Not Found", 404)
