@@ -20,7 +20,11 @@ class Game(ResourceBase):
             _game = models.Game.load(uuid=game_id, db=context.db)
             if _game is None:
                 raise ApiException("Not Found", 404)
-            _ret = _game.entity
+
+            if _game.owner_id == context.user.player_id:
+                _ret = _game.private_entity
+            else:
+                _ret = _game.entity
         else:
             _ret = dict(games=models.Game.list(db=context.db))
         return _ret

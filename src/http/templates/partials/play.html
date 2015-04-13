@@ -4,7 +4,37 @@
     <dd>[[ game.desc ]]</dd>
     <dd>[[ game.state ]]</dd>
 </dl>
+
+<div ng-if="isOwner && game.state == 'Open'">
+    <!--
+        Region for dealing a new story
+        You must own the game, and the game must be in an open state.
+    -->
+    <form>
+        <div class="form-group">
+            <label for="txtNewStory">New Story:</label>
+            <textarea  ng-model="$parent.newStory"
+                       id="txtNewStory"
+                       class="form-control"
+                       placeholder="As a dealer, i need a good story so that the team can properly assess the required effort.">
+            </textarea>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-success" ng-click="dealHand()">Send Story</button>
+        </div>
+    </form>
+</div>
+
+<div ng-if="game.current_hand">
+    <h3>Current Story</h3>
+    <blockquote>[[ game.current_hand.body ]]</blockquote>
+    <div class="cardInDeck grow"><span>Pass</span></div>
+    <div class="cardInDeck grow" ng-repeat="p in game.pts_scale"><span>[[ p ]]</span></div>
+</div>
+
+<br/>
 <pre>[[ debug ]]</pre>
-<div>
+<div class="pull-right">
     <button class="btn btn-warning" ng-click="leaveGame()">Exit Game</button>
+    <button ng-if="isOwner" class="btn btn-danger" ng-click="endGame()">End Game</button>
 </div>

@@ -91,7 +91,7 @@ angular.module('theApp')
             .success(function(data) { def.resolve(data); })
             .error(function(response, code) { def.reject(response); });
             return def.promise;
-        }
+        };
 
         _ret.joinGame = function(gameId, password) {
             /* POST /api/v0.1/player/:gameId : Join the game, gameId.
@@ -109,7 +109,7 @@ angular.module('theApp')
             .success(function(data) { def.resolve(data); })
             .error(function(response, code) { def.reject(response); });
             return def.promise;
-        }
+        };
 
         _ret.leaveGame = function(gameId, playerId) {
             /* DELETE /api/v0.1/player/:gameId/:playerId : Remove a player from the game.
@@ -127,7 +127,7 @@ angular.module('theApp')
             .success(function(data) { def.resolve(data); })
             .error(function(response, code) { def.reject(response); });
             return def.promise;
-        }
+        };
 
         _ret.getJobStatus = function(jobId) {
             /* GET /api/v0.1/jobs/:jobId : Retrieve queued item, jobId
@@ -144,7 +144,25 @@ angular.module('theApp')
             .success(function(data) { def.resolve(data); })
             .error(function(response, code) { def.reject(response); });
             return def.promise;
-        }
+        };
+
+        _ret.dealHand = function(gameId, story) {
+            /* PUT /api/v0.1/hand/:gameId : Deal the hand for game, gameId
+             *
+             * Arguments:
+             *  gameId : The game to deal the hand to.
+             *  story : The user story for the hand.
+             *
+             * Returns: (as promise)
+             *  On success, Enqueue Job Entity { ... }
+             *  On error, { message: MESSAGE, status_code: STATUS_CODE }
+             */
+             var def = $q.defer();
+             $http.put(urlBase+'/hand/'+gameId, { body: story })
+            .success(function(data) { def.resolve(data); })
+            .error(function(response, code) { def.reject(response); });
+            return def.promise;
+        };
 
         return _ret;
 

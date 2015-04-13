@@ -110,6 +110,10 @@ class Game(object):
             result = self.process_worker_request(game_model, item)
         elif item.doc_type == models.Player.__document_namespace__:
             result = self.porcess_add_player(game_model, item)
+        elif item.doc_type == models.Hand.__document_namespace__:
+            result = self.process_deal_hand(game_model, item)
+
+        pp(item.__document__)
 
         print "Process success: {0}".format(result)
 
@@ -150,3 +154,17 @@ class Game(object):
 
         return item.set_job_status(403, message="Request Forbidden")
 
+    def process_deal_hand(self, game_model, item):
+        if game_model.state != 'Open':
+            return item.set_job_status(409, message="The game is not open.")
+
+        if game_model.current_hand is not None:
+            return item.set_job_status(409, message="A hand is already in play.")
+
+        # Add the hand to the game and set the state to playing.
+        _hand = models.Hand(document=item.data)
+        game_model.current_hand = _hand.private_entity
+        game_model.state = 'Playing'
+
+        _ret = game_model.save()
+        return _ret and item.set_job_status(200, message="Hand dealt.")

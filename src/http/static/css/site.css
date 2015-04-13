@@ -1,0 +1,31 @@
+.cardInDeck {
+    border: solid 1px #aaa;
+    border-radius: 5px;
+    width: 100px;
+    display:inline-block;
+    margin: 0px 5px;
+    height: 150px;
+    font-size: x-large;
+    text-align: center;
+    padding-top: 60px;
+    background: rgb(176,212,227); /* Old browsers */
+    background: -moz-linear-gradient(top, rgba(176,212,227,1) 0%, rgba(136,186,207,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(176,212,227,1)), color-stop(100%,rgba(136,186,207,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgba(176,212,227,1) 0%,rgba(136,186,207,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(176,212,227,1) 0%,rgba(136,186,207,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(176,212,227,1) 0%,rgba(136,186,207,1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgba(176,212,227,1) 0%,rgba(136,186,207,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b0d4e3', endColorstr='#88bacf',GradientType=0 ); /* IE6-9 */
+    -webkit-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.35);
+    -moz-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.35);
+    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.35);
+
+}
+
+.grow {
+    transition: all .2s ease-in-out;
+}
+
+.grow:hover {
+    transform: scale(1.3);
+}

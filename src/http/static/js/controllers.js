@@ -7,6 +7,20 @@ app.controller('rootCtrl', ['$rootScope', '$location', '$modal', 'poker-api', fu
         $location.path(path);
     };
 
+    $rootScope.showStatusModal = function(jobId, message) {
+        var inst = $modal.open({
+            templateUrl: 'partials/jobStatus_modal.html',
+            controller: 'jobStatusCtrl',
+            size: 'sm',
+            resolve: {
+                message: function () { return message; },
+                jobId: function() { return jobId; }
+            }
+        });
+
+        return inst;
+    };
+
     var getPlayerName = function() {
         /* Get the player's name either from the active session or prompt the user.
          * If we need to prompt the user, the Register modal will be used to create
@@ -72,15 +86,8 @@ app.controller('homeCtrl', ['$scope', '$modal', 'poker-api', function($scope, $m
             console.log(job);
 
             // Show the job status in the jobStatus modal.
-            $modal.open({
-                templateUrl: 'partials/jobStatus_modal.html',
-                controller: 'jobStatusCtrl',
-                size: 'sm',
-                resolve: {
-                    message: function () { return "Joining Game..."; },
-                    jobId: function() { return job.job_id; }
-                }
-            }).result.then(function(data) {
+            $scope.showStatusModal(job.job_id, "Joining Game...")
+            .result.then(function(data) {
                 $scope.go('/play/'+gameId);
             });
 
@@ -142,12 +149,28 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
     $scope.gameId = $routeParams.gameId;
 
     $scope.leaveGame = function() {
-        api.leaveGame($scope.gameId, $scope.playerId).then(function(data) {
-            console.log(data);
+        api.leaveGame($scope.gameId, $scope.playerId).then(function(job) {
+            // Show the job status in the jobStatus modal.
+            $scope.showStatusModal(job.job_id, "Leaving game...")
+            .result.then(function(data) {
+                $scope.go('/');
+            });
         })
-        console.log($scope.playerId)
-        console.log("ok")
-    }
+    };
+
+    $scope.closeGame = function() {
+    };
+
+    $scope.dealHand = function() {
+        //var a = $('#txtNewStory').value;
+        api.dealHand($scope.gameId, $scope.newStory)
+        .then(function(job) {
+            $scope.showStatusModal(job.job_id, "Dealing new hand...")
+            .result.then(function(data) {
+                $scope.newStory = "";
+            });
+        });
+    };
 
     function _updateGame() {
         // Make sure that the modal is still open.
@@ -156,6 +179,7 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
         api.getGame($scope.gameId)
         .then(function(game) {
             $scope.game = game;
+            $scope.isOwner = game.owner_id == $scope.playerId
             $scope.debug = JSON.stringify(game);
             console.log(game);
             window.setTimeout(_updateGame, 3000);
