@@ -1,40 +1,77 @@
-<br/>
-<dl>
+<!-- dl>
     <dt>[[ game.title ]]</dt>
     <dd>[[ game.desc ]]</dd>
     <dd>[[ game.state ]]</dd>
-</dl>
+</dl -->
 
-<div ng-if="isOwner && game.state == 'Open'">
-    <!--
-        Region for dealing a new story
-        You must own the game, and the game must be in an open state.
-    -->
-    <form>
-        <div class="form-group">
-            <label for="txtNewStory">New Story:</label>
-            <textarea  ng-model="$parent.newStory"
-                       id="txtNewStory"
-                       class="form-control"
-                       placeholder="As a dealer, i need a good story so that the team can properly assess the required effort.">
-            </textarea>
-        </div>
-        <div class="form-group">
-            <button class="btn btn-success" ng-click="dealHand()">Send Story</button>
-        </div>
-    </form>
+<div class="pull-right">
+    <button class="btn btn-warning" ng-click="leaveGame(playerId)">Exit Game</button>
+    <button ng-if="isOwner" class="btn btn-danger" ng-click="endGame()">End Game</button>
 </div>
+<h3>[[ game.title ]]</h3>
+<p class="lead">[[ game.desc ]]</p>
+<hr />
 
-<div ng-if="game.current_hand">
-    <h3>Current Story</h3>
-    <blockquote>[[ game.current_hand.body ]]</blockquote>
-    <div class="cardInDeck grow"><span>Pass</span></div>
-    <div class="cardInDeck grow" ng-repeat="p in game.pts_scale"><span>[[ p ]]</span></div>
+<div class="row">
+    <div class="col-md-9">
+
+        <div ng-if="isOwner && game.state == 'Open'">
+            <!--
+                Region for dealing a new story
+                You must own the game, and the game must be in an open state.
+            -->
+            <form>
+                <div class="form-group">
+                    <label for="txtNewStory">New Story:</label>
+                    <textarea  ng-model="$parent.newStory"
+                               id="txtNewStory"
+                               class="form-control"
+                               placeholder="As a dealer, i need a good story so that the team can properly assess the required effort.">
+                    </textarea>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-success" ng-click="dealHand()">Send Story</button>
+                </div>
+            </form>
+        </div>
+
+        <div ng-if="game.state == 'Playing'">
+            <h3>Current Story</h3>
+            <blockquote>[[ game.current_hand.body ]]</blockquote>
+            <div class="cardInDeck grow"><span>Pass</span></div>
+            <div class="cardInDeck grow" ng-repeat="p in game.pts_scale"><span>[[ p ]]</span></div>
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+        <div class="well">
+            <h4>Players</h4>
+            <!-- ul class="list-unstyled">
+                <li ng-repeat="p in game.players">[[p]]</li>
+            </ul -->
+            <table class="table">
+                <tr ng-repeat="(key, p) in game.players">
+                    <td ng-if="game.state == 'Playing' && game.current_hand.votes[key] != null"><span class="glyphicon glyphicon-check"></span></td>
+                    <td ng-if="game.state == 'Playing' && game.current_hand.votes[key] == null"><span class="glyphicon glyphicon-unchecked"></span></td>
+                    <td>[[p]]</td>
+                    <td ng-if="isOwner" ng-click="leaveGame(key)"><span class="glyphicon glyphicon-remove"></span></td>
+                </tr>
+            </table>
+        </div>
+        <div class="pull-right">
+            <button class="btn btn-warning" ng-if="isOwner && game.state == 'Playing'" ng-click="cancelHand()">Cancel Hand</button>
+        </div>
+    </div>
 </div>
 
 <br/>
+<br/>
+<br/>
+<br/>
 <pre>[[ debug ]]</pre>
-<div class="pull-right">
-    <button class="btn btn-warning" ng-click="leaveGame()">Exit Game</button>
-    <button ng-if="isOwner" class="btn btn-danger" ng-click="endGame()">End Game</button>
-</div>
+
+<h4>Fake State</h4>
+<button ng-click="fakeState('Open')" class="btn btn-default">Open</button>
+<button ng-click="fakeState('Playing')" class="btn btn-default">Playing</button>
+<button ng-click="fakeState('Reviewing')" class="btn btn-default">Reviewing</button>

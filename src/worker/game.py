@@ -121,6 +121,8 @@ class Game(object):
         _request = models.WorkerRequest(document=item.data)
         if _request.action == 'remove_player':
             return self.process_remove_player(game_model, item)
+        elif _request.action == 'abort_hand':
+            return self.process_abort_hand(game_model, item)
         return item.set_job_status(400, message="Unknown action request.")
 
     def porcess_add_player(self, game_model, item):
@@ -158,8 +160,8 @@ class Game(object):
         if game_model.state != 'Open':
             return item.set_job_status(409, message="The game is not open.")
 
-        if game_model.current_hand is not None:
-            return item.set_job_status(409, message="A hand is already in play.")
+        #if game_model.current_hand is not None:
+            #return item.set_job_status(409, message="A hand is already in play.")
 
         # Add the hand to the game and set the state to playing.
         _hand = models.Hand(document=item.data)
@@ -168,3 +170,12 @@ class Game(object):
 
         _ret = game_model.save()
         return _ret and item.set_job_status(200, message="Hand dealt.")
+
+    def process_abort_hand(self, game_model, item):
+        if game_model.state != 'Playing':
+            return item.set_job_status(409, message="No hand in play.")
+
+        game_model.current_hand = None
+        game_model.state = 'Open'
+        _ret = game_model.save()
+        return _ret and item.set_job_status(200, message="Hand canceled.")

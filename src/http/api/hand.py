@@ -27,7 +27,6 @@ class Hand(ResourceBase):
 
     @utils.enqueue
     def delete(self, game_id):
-        raise NotImplementedError("Untestable without worker thread")
         _game = models.Game.load(game_id, db=context.db)
         if not _game:
             raise ApiException('Not Found', 404)

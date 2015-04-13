@@ -22,7 +22,12 @@
 
     <body ng-app="theApp" ng-controller='rootCtrl'>
         <div class='container'>
-            <b>Player Name: [[ displayName ]]</b>
+            <div class="navbar navbar-default">
+                <a class="navbar-brand" href>Pivotal Poker</a>
+                <ul class="nav navbar-nav pull-right">
+                    <li><a>Player: [[displayName]]</a></li>
+                </ul>
+            </div>
             <div ng-view></div>
         </div>
     </body>

@@ -164,6 +164,23 @@ angular.module('theApp')
             return def.promise;
         };
 
+        _ret.cancelHand = function(gameId) {
+            /* DELETE /api/v0.1/hand/:gameId : Delete a hand
+             *
+             * Arguments:
+             *  gameId : The game to delete the hand from.
+             *
+             * Returns: (as promise)
+             *  On success, Enqueue Job Entity { ... }
+             *  On error, { message: MESSAGE, status_code: STATUS_CODE }
+             */
+             var def = $q.defer();
+             $http.delete(urlBase+'/hand/'+gameId)
+            .success(function(data) { def.resolve(data); })
+            .error(function(response, code) { def.reject(response); });
+            return def.promise;
+        };
+
         return _ret;
 
     }]);

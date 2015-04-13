@@ -148,15 +148,24 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
     console.log($routeParams.gameId);
     $scope.gameId = $routeParams.gameId;
 
-    $scope.leaveGame = function() {
-        api.leaveGame($scope.gameId, $scope.playerId).then(function(job) {
+    $scope.leaveGame = function(playerId) {
+        api.leaveGame($scope.gameId, playerId).then(function(job) {
             // Show the job status in the jobStatus modal.
             $scope.showStatusModal(job.job_id, "Leaving game...")
             .result.then(function(data) {
-                $scope.go('/');
+                if(playerId == $scope.playerId)
+                    $scope.go('/');
             });
-        })
+        });
     };
+
+    $scope.cancelHand = function() {
+        console.log("Ok");
+        api.cancelHand($scope.gameId).then(function(job) {
+            // Show the job status in the jobStatus modal.
+            $scope.showStatusModal(job.job_id, "Canceling hand...");
+        });
+    }
 
     $scope.closeGame = function() {
     };
@@ -191,6 +200,10 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
     }
 
     _updateGame();
+
+    $scope.fakeState = function(state) {
+        $scope.game.state = state;
+    };
 }]);
 
 app.controller('aboutCtrl', ['$scope', function($scope) {
