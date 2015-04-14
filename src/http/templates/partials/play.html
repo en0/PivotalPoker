@@ -42,6 +42,28 @@
             <div class="cardInDeck grow" ng-repeat="p in game.pts_scale" ng-click="castVote(p);"><span>[[ p ]]</span></div>
         </div>
 
+        <div ng-if="game.state == 'Reviewing'">
+            <h3>Review Current Story</h3>
+            <blockquote>[[ game.current_hand.body ]]</blockquote>
+            <div ng-if="isOwner">
+                <form class="form-inline">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-stats" style="font-size: large;" aria-hidden="true"></span>
+                        </span>
+                        <input type="text" class="form-control" />
+                    </div>
+                    <button class="btn btn-success">Accept</button>
+                    <button class="btn btn-warning">Re-vote</button>
+                    <button class="btn btn-danger">Reject</button>
+                </form>
+            </div><br/>
+            <div class="cardInDeck" ng-repeat="p in game.current_hand.votes">
+                <span>[[ p.vote ]]</span><br/>
+                <small>[[ p.name ]]</small>
+            </div>
+        </div>
+
     </div>
 
     <div class="col-md-3">
