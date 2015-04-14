@@ -112,6 +112,8 @@ class Game(object):
             result = self.porcess_add_player(game_model, item)
         elif item.doc_type == models.Hand.__document_namespace__:
             result = self.process_deal_hand(game_model, item)
+        elif item.doc_type == models.Vote.__document_namespace__:
+            result = self.process_cast_vote(game_model, item)
 
         pp(item.__document__)
 
@@ -160,9 +162,6 @@ class Game(object):
         if game_model.state != 'Open':
             return item.set_job_status(409, message="The game is not open.")
 
-        #if game_model.current_hand is not None:
-            #return item.set_job_status(409, message="A hand is already in play.")
-
         # Add the hand to the game and set the state to playing.
         _hand = models.Hand(document=item.data)
         game_model.current_hand = _hand.private_entity
@@ -172,10 +171,32 @@ class Game(object):
         return _ret and item.set_job_status(200, message="Hand dealt.")
 
     def process_abort_hand(self, game_model, item):
+        _request = models.WorkerRequest(document=item.data)
+
         if game_model.state != 'Playing':
             return item.set_job_status(409, message="No hand in play.")
+
+        if _request.request_by != game_model.owner_id:
+            return item.set_job_status(403, message="Request Forbidden")
 
         game_model.current_hand = None
         game_model.state = 'Open'
         _ret = game_model.save()
         return _ret and item.set_job_status(200, message="Hand canceled.")
+
+    def process_cast_vote(self, game_model, item):
+        if game_model.state != 'Playing':
+            return item.set_job_status(409, message="No hand in play.")
+
+        _vote = models.Vote(document=item.data)
+        _player_name = game_model.players.get(_vote.player_id)
+
+        # verify player_id is playing
+        if not _player_name:
+            return item.set_job_status(401, message="You are not in this game.")
+
+        # Cast vote and possibly close hand
+        game_model.cast_vote(_vote)
+        _ret = game_model.save()
+
+        return _ret and item.set_job_status(200, message="Vote Accepted.")

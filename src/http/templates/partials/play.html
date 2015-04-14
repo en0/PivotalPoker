@@ -38,8 +38,8 @@
         <div ng-if="game.state == 'Playing'">
             <h3>Current Story</h3>
             <blockquote>[[ game.current_hand.body ]]</blockquote>
-            <div class="cardInDeck grow"><span>Pass</span></div>
-            <div class="cardInDeck grow" ng-repeat="p in game.pts_scale"><span>[[ p ]]</span></div>
+            <div class="cardInDeck grow" ng-click="castVote(None);"><span>Pass</span></div>
+            <div class="cardInDeck grow" ng-repeat="p in game.pts_scale" ng-click="castVote(p);"><span>[[ p ]]</span></div>
         </div>
 
     </div>

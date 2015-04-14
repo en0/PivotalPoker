@@ -92,3 +92,28 @@ class Game(GameBase):
         if player_id in self.__document__['players']:
             del self.__document__['players'][player_id]
             self.__is_dirty__ = True
+
+    def cast_vote(self, vote):
+        # verify hand and players
+        if not self.__document__['current_hand'] or not self.__document__['players']:
+            return
+
+        # Get player name and verify player is in game
+        _player_name = self.__document__['players'].get(vote.player_id)
+        if not _player_name:
+            return
+
+        # Add the vote to the current hand
+        self.current_hand['votes'][vote.player_id] = {
+            'name': _player_name,
+            'vote': vote.vote
+        }
+
+        # Check if hand is complete.
+        _player_count = len(self.__document__['players'])
+        _vote_count = len(self.current_hand['votes'])
+
+        if _vote_count == _player_count:
+            self.state = "Reviewing"
+
+        self.__is_dirty__ = True

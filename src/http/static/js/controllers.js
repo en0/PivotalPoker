@@ -181,6 +181,14 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
         });
     };
 
+    $scope.castVote = function(value) {
+        console.log(value);
+        api.castVote($scope.gameId, value)
+        .then(function(job) {
+            $scope.showStatusModal(job.job_id, "Casting vote...");
+        });
+    };
+
     function _updateGame() {
         // Make sure that the modal is still open.
         if($scope.$$destroyed === true) return;

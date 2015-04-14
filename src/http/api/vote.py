@@ -6,8 +6,8 @@ import models
 import utils
 
 
-class Hand(ResourceBase):
-    __uri__ = '/api/v0.1/hand/'
+class Vote(ResourceBase):
+    __uri__ = '/api/v0.1/vote/'
     __pk__ = 'game_id'
     __pk_type__ = 'string'
     __method_hints__ = ['PUT', 'DELETE']
@@ -17,30 +17,26 @@ class Hand(ResourceBase):
         _game = models.Game.load(game_id, db=context.db)
         if not _game:
             raise ApiException('Not Found', 404)
-        elif _game.owner_id != context.user.player_id:
-            raise ApiException('Forbidden', 403)
-        elif _game.state != 'Open':
+        elif _game.state != 'Playing':
             raise ApiException('Conflict', 409)
 
-        _hand = models.Hand(request.get_json())
-        return models.QueueItem(game_id, _hand)
+        _vote = models.Vote(game_id, context.user.player_id, request.get_json())
+        return models.QueueItem(game_id, _vote)
 
     @utils.enqueue
     def delete(self, game_id):
         _game = models.Game.load(game_id, db=context.db)
         if not _game:
             raise ApiException('Not Found', 404)
-        elif _game.owner_id != context.user.player_id:
-            raise ApiException('Forbidden', 403)
         elif _game.state != 'Playing':
             raise ApiException('Conflict', 409)
 
         _request = models.WorkerRequest({
             'request_by': context.user.player_id,
-            'action': 'abort_hand',
+            'action': 'retract_vote',
             'params': None
         })
         return models.QueueItem(game_id, _request)
 
 
-register_route(Hand, app)
+register_route(Vote, app)

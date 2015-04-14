@@ -11,9 +11,21 @@ from models.generic_document import GenericDocumentFactory
 # the system will verify the player membership
 # The system will push the vote to the vote queue.
 
-Vote = GenericDocumentFactory('PokerVote', [
+VoteBase = GenericDocumentFactory('PokerVote', [
     # Name,       Req,  Pub
     ('game_id',   True, True),
     ('player_id', True, False),
     ('vote',      True, True)
 ])
+
+
+class Vote(VoteBase):
+    def __init__(self, game_id=None, player_id=None, json=None, document=None):
+        if document:
+            _json = None
+        else:
+            _json = json
+            _json['game_id'] = game_id
+            _json['player_id'] = player_id
+
+        super(Vote, self).__init__(json=_json, document=document)

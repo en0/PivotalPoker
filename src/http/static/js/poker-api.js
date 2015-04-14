@@ -181,6 +181,24 @@ angular.module('theApp')
             return def.promise;
         };
 
+        _ret.castVote = function(gameId, value) {
+            /* PUT /api/v0.1/vote/:gameId : Submit the vote for the current hand on game gameId.
+             *
+             * Arguments:
+             *  gameId : The game to cast the vote on.
+             *  value : The vote to submit.
+             *
+             * Returns: (as promise)
+             *  On success, Enqueue Job Entity { ... }
+             *  On error, { message: MESSAGE, status_code: STATUS_CODE }
+             */
+             var def = $q.defer();
+             $http.put(urlBase+'/vote/'+gameId, { vote: value })
+            .success(function(data) { def.resolve(data); })
+            .error(function(response, code) { def.reject(response); });
+            return def.promise;
+        };
+
         return _ret;
 
     }]);
