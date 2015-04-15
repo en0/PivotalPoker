@@ -114,6 +114,8 @@ class Game(object):
             result = self.process_deal_hand(game_model, item)
         elif item.doc_type == models.Vote.__document_namespace__:
             result = self.process_cast_vote(game_model, item)
+        elif item.doc_type == models.Result.__document_namespace__:
+            result = self.process_accept_vote(game_model, item)
 
         pp(item.__document__)
 
@@ -199,4 +201,29 @@ class Game(object):
         game_model.cast_vote(_vote)
         _ret = game_model.save()
 
-        return _ret and item.set_job_status(200, message="Vote Accepted.")
+        return _ret and item.set_job_status(200, message="Vote accepted.")
+
+    def process_accept_vote(self, game_model, item):
+        if game_model.state != 'Reviewing':
+            return item.set_job_status(409, message="The hand is not ready.")
+
+        _result = models.Result(document=item.data)
+
+        if 'Accept' == _result.result:
+            _p = int(_result.points)
+            game_model.complete_hand(_p)
+            _ret = game_model.save()
+            return _ret and item.set_job_status(200, message="Hand complete.")
+
+        elif 'Revote' == _result.result:
+            game_model.resetVote()
+            _ret = game_model.save()
+            return _ret and item.set_job_status(200, message="Reset hand complete.")
+
+        elif 'Cancel' == _result.result:
+            game_model.current_hand = None
+            game_model.state = 'Open'
+            _ret = game_model.save()
+            return _ret and item.set_job_status(200, message="Hand canceled.")
+
+        return item.set_job_status(400, message="Unknown result action.")

@@ -199,6 +199,25 @@ angular.module('theApp')
             return def.promise;
         };
 
+        _ret.applyVote = function(gameId, action, value) {
+            /* PUT /api/v0.1/result/:gameId : Submit the results of a hand
+             *
+             * Arguments:
+             *  gameId : The game that the handResult applies to.
+             *  action : A value indicating accept, revote or cancel.
+             *  value : The value to apply.
+             *
+             * Returns: (as promise)
+             *  On success, Enqueue Job Entity { ... }
+             *  On error, { message: MESSAGE, status_code: STATUS_CODE }
+             */
+             var def = $q.defer();
+             $http.put(urlBase+'/result/'+gameId, { result: action, points: value })
+            .success(function(data) { def.resolve(data); })
+            .error(function(response, code) { def.reject(response); });
+            return def.promise;
+        };
+
         return _ret;
 
     }]);

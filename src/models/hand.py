@@ -15,7 +15,7 @@ HandBase = GenericDocumentFactory('PokerHand', [
     # Name,         Req,  Pub
     ('body', True, True),
     ('votes', True, True),  # dict { 'uuid': { 'name' : 'Player Name', 'vote' : None } }
-    ('complete', True, True),
+    ('points', False, True)
 ])
 
 
@@ -26,6 +26,5 @@ class Hand(HandBase):
         else:
             _json = json
             _json['votes'] = {}
-            _json['complete'] = False
 
         super(Hand, self).__init__(json=_json, document=document)

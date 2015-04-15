@@ -51,11 +51,11 @@
                         <span class="input-group-addon">
                             <span class="glyphicon glyphicon-stats" style="font-size: large;" aria-hidden="true"></span>
                         </span>
-                        <input type="text" class="form-control" />
+                        <input type="text" class="form-control" name="txtResult" id="txtResult" ng-model="$parent.$parent.voteResult" />
                     </div>
-                    <button class="btn btn-success">Accept</button>
-                    <button class="btn btn-warning">Re-vote</button>
-                    <button class="btn btn-danger">Reject</button>
+                    <button class="btn btn-success" ng-click="applyVote('Accept');">Accept</button>
+                    <button class="btn btn-warning" ng-click="applyVote('Revote');">Re-vote</button>
+                    <button class="btn btn-danger" ng-click="applyVote('Cancel');">Reject</button>
                 </form>
             </div><br/>
             <div class="cardInDeck" ng-repeat="p in game.current_hand.votes">

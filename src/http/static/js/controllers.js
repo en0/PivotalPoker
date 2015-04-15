@@ -160,10 +160,15 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
     };
 
     $scope.cancelHand = function() {
-        console.log("Ok");
         api.cancelHand($scope.gameId).then(function(job) {
-            // Show the job status in the jobStatus modal.
             $scope.showStatusModal(job.job_id, "Canceling hand...");
+        });
+    }
+
+    $scope.applyVote = function(action) {
+        console.log($scope.voteResult);
+        api.applyVote($scope.gameId, action, $scope.voteResult).then(function(job) {
+            $scope.showStatusModal(job.job_id, "Finalizing vote...");
         });
     }
 

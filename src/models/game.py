@@ -1,6 +1,7 @@
 __author__ = 'en0'
 
 from models.redis_document import RedisDocumentFactory
+import copy
 
 # To start a game -
 # Post a game with title, description, pts_scale, and password (optional)
@@ -117,3 +118,24 @@ class Game(GameBase):
             self.state = "Reviewing"
 
         self.__is_dirty__ = True
+
+    def resetVote(self):
+        # verify hand
+        if not self.__document__['current_hand']:
+            return
+
+        self.current_hand['votes'] = {}
+        self.state = "Playing"
+
+    def complete_hand(self, points):
+        # verify hand
+        if not self.__document__['current_hand']:
+            return
+
+        # Move the current hand into the completed hands list and empty the current hand
+        complete_hand = copy.deepcopy(self.__document__['current_hand'])
+        complete_hand['points'] = points
+        self.__document__['current_hand'] = None
+        self.__document__['hands'].append(complete_hand)
+
+        self.state = "Open"

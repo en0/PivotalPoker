@@ -13,7 +13,6 @@ from models.generic_document import GenericDocumentFactory
 
 Result = GenericDocumentFactory('PokerHandResult', [
     # Name,       Req,  Pub
-    ('game_id',   True, True),
     ('result',    True, False), # Choice [ 'Accept', 'Revote', 'Cancel' ]
     ('points',    False, True)
 ])
