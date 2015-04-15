@@ -87,13 +87,23 @@
     </div>
 </div>
 
+<hr/>
+<accordion>
+    <accordion-group ng-repeat="hand in game.hands | reverse" ng-click="setVisibleHand($index)" is-open="isVisibleHand($index)">
+        <accordion-heading>
+            <span>[[hand.body | truncate : 100 : '...']]</span>
+            <span class="pull-right">Points: [[hand.points]]</span>
+        </accordion-heading>
+        <p class="lead">[[hand.body]]</p>
+        <div class="cardInDeck" ng-repeat="v in hand.votes">
+            <span>[[ v.vote ]]</span><br/>
+            <small>[[ v.name ]]</small>
+        </div>
+    </accordion-group>
+</accordion>
+
 <br/>
 <br/>
 <br/>
 <br/>
 <pre>[[ debug ]]</pre>
-
-<h4>Fake State</h4>
-<button ng-click="fakeState('Open')" class="btn btn-default">Open</button>
-<button ng-click="fakeState('Playing')" class="btn btn-default">Playing</button>
-<button ng-click="fakeState('Reviewing')" class="btn btn-default">Reviewing</button>

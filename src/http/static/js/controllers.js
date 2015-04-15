@@ -147,6 +147,18 @@ app.controller('homeCtrl', ['$scope', '$modal', 'poker-api', function($scope, $m
 app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($scope, $routeParams, api) {
     console.log($routeParams.gameId);
     $scope.gameId = $routeParams.gameId;
+    $scope.handVisibleIndex = -1;
+
+    $scope.setVisibleHand = function(index) {
+        if(!$scope.isVisibleHand(index))
+            $scope.handVisibleIndex = index;
+        else
+            $scope.handVisibleIndex = -1;
+    };
+
+    $scope.isVisibleHand = function(index) {
+        return $scope.handVisibleIndex == index;
+    };
 
     $scope.leaveGame = function(playerId) {
         api.leaveGame($scope.gameId, playerId).then(function(job) {
@@ -213,7 +225,6 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
     }
 
     _updateGame();
-
     $scope.fakeState = function(state) {
         $scope.game.state = state;
     };
