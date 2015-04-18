@@ -101,14 +101,18 @@ class Game(object):
                 _model = self.reload()
 
                 # Process the request.
-                self.process(_model, _item)
+                # noinspection PyBroadException
+                try:
+                    self.process(_model, _item, count=2)
+                except:
+                    _item.set_job_status(500, message="The job encountered an unknown error.")
 
             # re-pull game ids so we can verify our game is still in play
             _game_ids = self._db.hkeys('PokerGame')
 
         print("Exiting: {0}".format(self._queue))
 
-    def process(self, game_model, item):
+    def process(self, game_model, item, count=0):
         # [ 'Open', 'Playing', 'Reviewing' ]
         result = False
         if item.doc_type == models.WorkerRequest.__document_namespace__:
@@ -123,6 +127,12 @@ class Game(object):
             result = self.process_accept_vote(game_model, item)
 
         print "Process success: {0}".format(result)
+        if not result and count > 1:
+            return self.process(game_model, item, count-1)
+        elif not result:
+            item.set_job_status(400, message="Job was not acceptable.")
+
+        return result
 
     def process_worker_request(self, game_model, item):
         _request = models.WorkerRequest(document=item.data)
@@ -213,7 +223,12 @@ class Game(object):
         _result = models.Result(document=item.data)
 
         if 'Accept' == _result.result:
-            _p = int(_result.points)
+            try:
+                _p = int(_result.points)
+                if _p not in game_model.pts_scale:
+                    return item.set_job_status(400, message="{0} is not a valid value for this game.".format(_p))
+            except ValueError:
+                return item.set_job_status(500, message="{0} is not a valid result.".format(_result.points))
             game_model.complete_hand(_p)
             _ret = game_model.save()
             return _ret and item.set_job_status(200, message="Hand complete.")

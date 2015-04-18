@@ -42,7 +42,7 @@
         <div ng-if="game.state == 'Playing'">
             <h3>Current Story</h3>
             <blockquote>[[ game.current_hand.body ]]</blockquote>
-            <div class="cardInDeck grow" ng-click="castVote(None);"><span>Pass</span></div>
+            <div class="cardInDeck grow" ng-click="castVote(None);"><span ng-click="castVote(null)">Pass</span></div>
             <div class="cardInDeck grow" ng-repeat="p in game.pts_scale" ng-click="castVote(p);"><span>[[ p ]]</span></div>
         </div>
 
@@ -63,7 +63,8 @@
                 </form>
             </div><br/>
             <div class="cardInDeck" ng-repeat="p in game.current_hand.votes">
-                <span>[[ p.vote ]]</span><br/>
+                <span ng-if="p.vote != null">[[ p.vote ]]</span>
+                <span ng-if="p.vote == null">PASS</span><br/>
                 <small>[[ p.name ]]</small>
             </div>
         </div>
@@ -101,7 +102,8 @@
         </accordion-heading>
         <p class="lead">[[hand.body]]</p>
         <div class="cardInDeck" ng-repeat="v in hand.votes">
-            <span>[[ v.vote ]]</span><br/>
+            <span ng-if="v.vote != null">[[ v.vote ]]</span>
+            <span ng-if="v.vote == null">PASS</span><br/>
             <small>[[ v.name ]]</small>
         </div>
     </accordion-group>
