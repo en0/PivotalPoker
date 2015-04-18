@@ -9,16 +9,16 @@ from os import getenv
 from redis import Redis as RRedis
 
 
-def _extend_attrib(dest, source):
+def _extend_attrib(target, source):
     for attrib in [a for a in dir(source) if not a.startswith('__')]:
-        dest[attrib] = getattr(source, attrib)
+        target[attrib] = getattr(source, attrib)
 
 
-def _load_config(envar):
+def _load_config(config_environmental_variable):
     _config = {}
     _extend_attrib(_config, config.Default)
     try:
-        _path = getenv(envar)
+        _path = getenv(config_environmental_variable)
         if _path:
             custom_config = imp.load_source("CONFIG", _path)
             _extend_attrib(_config, custom_config)
@@ -71,7 +71,6 @@ class Monitor():
         self._event.set()
 
     def __call__(self):
-        print("ok")
         def _games_forever(db):
             while not self._event.is_set():
                 for gid in Game.get_games(db):
