@@ -35,6 +35,10 @@
             </form>
         </div>
 
+        <div ng-if="!isOwner && game.state == 'Open'">
+            <p class="lead">Waiting for the dealer to provide a story.</p>
+        </div>
+
         <div ng-if="game.state == 'Playing'">
             <h3>Current Story</h3>
             <blockquote>[[ game.current_hand.body ]]</blockquote>
