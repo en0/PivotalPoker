@@ -39,7 +39,6 @@ GameBase = RedisDocumentFactory('PokerGame', [
 
 
 class Game(GameBase):
-
     @classmethod
     def create(cls, owner_id, owner_name, json, db):
         json['owner_id'] = owner_id
@@ -77,6 +76,10 @@ class Game(GameBase):
         _ret = super(Game, self).private_entity
         _ret['game_id'] = self.uuid
         return _ret
+
+    #def register_game(self):
+    #    key = "{0}:active".format(self.__document_namespace__)
+    #    self.__db__.lpush(key, self.uuid)
 
     def add_player(self, player_id=None, name=None, player=None):
         if player:

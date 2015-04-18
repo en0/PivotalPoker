@@ -1,13 +1,18 @@
 __author__ = 'en0'
 
 import pickle
-from pprint import pprint as pp
 import models
 from redis import Redis
 from time import time, sleep
 
 
 class Game(object):
+
+    @classmethod
+    def get_games(cls, db):
+        for _game_key in db.hkeys("PokerGame"):
+            yield _game_key
+
     def __init__(self, game_id, db):
         assert isinstance(db, Redis)
         self._db = db
@@ -23,10 +28,10 @@ class Game(object):
         _time = self._db.get(self._heart_beat_key)
         _now = time()
 
-        # If _tiem has a value then its possible that a worker is already handing this queue.
+        # If _time has a value then its possible that a worker is already handing this queue.
         if _time is not None:
             # Lets make sure it is still up
-            _delta = (_now - _time) + 10
+            _delta = (_now - float(_time)) + 10
 
             # Wait for the timeout to make sure the worker still beats
             if _delta > 0:
@@ -68,13 +73,13 @@ class Game(object):
     def reload(self):
         return models.Game.load(self._game_id, db=self._db)
 
-    def __call__(self):
+    def __call__(self, event):
 
         _game_ids = self._db.hkeys('PokerGame')
         print("waiting on queue: {0}".format(self._queue))
 
         # Loop while the game exists.
-        while self._game_id in _game_ids:
+        while self._game_id in _game_ids and not event.is_set():
 
             # Heart Beat
             self.keep_alive()
@@ -116,8 +121,6 @@ class Game(object):
             result = self.process_cast_vote(game_model, item)
         elif item.doc_type == models.Result.__document_namespace__:
             result = self.process_accept_vote(game_model, item)
-
-        pp(item.__document__)
 
         print "Process success: {0}".format(result)
 

@@ -74,8 +74,9 @@
             </ul -->
             <table class="table">
                 <tr ng-repeat="(key, p) in game.players">
-                    <td ng-if="game.state == 'Playing' && game.current_hand.votes[key] != null"><span class="glyphicon glyphicon-check"></span></td>
+                    <td ng-if="game.state == 'Playing' && game.current_hand.votes[key] != null"><span class="glyphicon glyphicon-check" style="color: #5cb85c;"></span></td>
                     <td ng-if="game.state == 'Playing' && game.current_hand.votes[key] == null"><span class="glyphicon glyphicon-unchecked"></span></td>
+                    <td ng-if="game.state == 'Reviewing' && game.current_hand.votes[key] != null"><span class="glyphicon glyphicon-check" style="color: #5cb85c;"></span></td>
                     <td>[[p]]</td>
                     <td ng-if="isOwner" ng-click="leaveGame(key)"><span class="glyphicon glyphicon-remove"></span></td>
                 </tr>
