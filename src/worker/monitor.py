@@ -94,4 +94,4 @@ class Monitor():
             _job = models.BackgroundJob.load(job_id, db=self._db)
             if (_now - _job.mtime) > 100:
                 print("Removing expired key: {0}".format(job_id))
-                self._db.hdel(models.BackgroundJob.__document_namespace__, job_id)
+                _job.delete()

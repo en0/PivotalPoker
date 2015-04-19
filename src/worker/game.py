@@ -66,7 +66,7 @@ class Game(object):
             # Verify owner exists
             if len(self._db.keys("session:{0}".format(_model.owner_id))) == 0:
                 print("NOTICE: Owner's session expired for game {0}. Close game.".format(self._game_id))
-                self._db.hdel("PokerGame", self._game_id)
+                _model.delete()
                 break
 
             # Heart Beat
