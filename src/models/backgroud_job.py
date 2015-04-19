@@ -1,12 +1,14 @@
 __author__ = 'en0'
 
 from models.redis_document import RedisDocumentFactory
+from time import time
 
 
 BackgroundJobBase = RedisDocumentFactory('jobs', [
     # Name, Req, Pub
     ('status', True, True),
-    ('message', False, True)
+    ('message', False, True),
+    ('mtime', False, True),
 ])
 
 
@@ -26,6 +28,12 @@ class BackgroundJob(BackgroundJobBase):
         _ret = super(BackgroundJob, self).private_entity
         _ret['job_id'] = self.uuid
         return _ret
+
+    def save(self):
+        # Add modified time but do it directly on the dict
+        # as to not flip the dirty flag.
+        self.__document__['mtime'] = int(time())
+        return super(BackgroundJob, self).save()
 
     def save_and_send(self):
         self.save()

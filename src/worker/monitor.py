@@ -4,9 +4,10 @@ from worker import Game
 import config
 import threading
 import imp
-from time import sleep
+from time import sleep, time
 from os import getenv
 from redis import Redis as RRedis
+import models
 
 
 def _extend_attrib(target, source):
@@ -84,4 +85,13 @@ class Monitor():
                 sleep(1)
             else:
                 del game
+                self._db_maintenance()
                 sleep(5)
+
+    def _db_maintenance(self):
+        _now = int(time())
+        for job_id in self._db.hkeys(models.BackgroundJob.__document_namespace__):
+            _job = models.BackgroundJob.load(job_id, db=self._db)
+            if (_now - _job.mtime) > 100:
+                print("Removing expired key: {0}".format(job_id))
+                self._db.hdel(models.BackgroundJob.__document_namespace__, job_id)
