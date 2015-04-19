@@ -1,12 +1,11 @@
+
 __author__ = 'en0'
 
-from flask import copy_current_request_context
 from http import app, request, context, ApiException
 from http.api.resource_base import ResourceBase, register_route
 from utils import require_session
-import gevent
+import utils
 import models
-import worker
 
 
 class Game(ResourceBase):
@@ -35,18 +34,23 @@ class Game(ResourceBase):
         _game.save()
         return _game.private_entity, 200, {'Location': '/api/v0.1/game/{0}'.format(_game.uuid)}
 
+    @utils.enqueue
     def delete(self, game_id):
         _game = models.Game.load(uuid=game_id, db=context.db)
 
         if _game is None:
             raise ApiException("Not Found", 404)
 
-        if str(_game.owner_id) == str(context.user.player_id):
-            _game.delete()
-        else:
+        if not str(_game.owner_id) == str(context.user.player_id):
             raise ApiException("Forbidden", 403)
 
-        return None, 204
+        _request = models.WorkerRequest({
+            'request_by': context.user.player_id,
+            'action': 'close_game',
+            'params': None
+        })
+
+        return models.QueueItem(game_id, _request)
 
 
 register_route(Game, app)

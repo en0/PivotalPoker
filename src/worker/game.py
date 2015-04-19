@@ -111,6 +111,7 @@ class Game(object):
             result = self.process_accept_vote(game_model, item)
 
         print "Process success: {0}".format(result)
+
         if not result and count > 1:
             return self.process(game_model, item, count-1)
         elif not result:
@@ -124,6 +125,8 @@ class Game(object):
             return self.process_remove_player(game_model, item)
         elif _request.action == 'abort_hand':
             return self.process_abort_hand(game_model, item)
+        elif _request.action == 'close_game':
+            return self.process_close_game(game_model, item)
         return item.set_job_status(400, message="Unknown action request.")
 
     def porcess_add_player(self, game_model, item):
@@ -182,6 +185,14 @@ class Game(object):
         game_model.state = 'Open'
         _ret = game_model.save()
         return _ret and item.set_job_status(200, message="Hand canceled.")
+
+    def process_close_game(self, game_model, item):
+        _request = models.WorkerRequest(document=item.data)
+        if game_model.owner_id != _request.request_by:
+            return item.set_job_status(403, message="Request Forbidden")
+
+        game_model.delete()
+        return item.set_job_status(200, message="Game has ended")
 
     def process_cast_vote(self, game_model, item):
         if game_model.state != 'Playing':

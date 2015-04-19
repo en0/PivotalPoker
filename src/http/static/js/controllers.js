@@ -185,6 +185,14 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
     }
 
     $scope.closeGame = function() {
+        console.log("Ok");
+        api.closeGame($scope.gameId)
+        .then(function(job) {
+            $scope.showStatusModal(job.job_id, "Closing the game...")
+            .result.then(function(data) {
+                $scope.go('/');
+            });
+        });
     };
 
     $scope.dealHand = function() {

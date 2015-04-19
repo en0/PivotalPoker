@@ -93,6 +93,23 @@ angular.module('theApp')
             return def.promise;
         };
 
+        _ret.closeGame = function(gameId) {
+            /* DELETE /api/v0.1/game/:gameId : Delete the game, gameId.
+             *
+             * Arguments:
+             *  gameId : The game to delete.
+             *
+             * Returns: (as promise)
+             *  On success, Enqueue Job Entity { ... }
+             *  On error, { message: MESSAGE, status_code: STATUS_CODE }
+             */
+             var def = $q.defer();
+             $http.delete(urlBase+'/game/' + gameId)
+            .success(function(data) { def.resolve(data); })
+            .error(function(response, code) { def.reject(response); });
+            return def.promise;
+        };
+
         _ret.joinGame = function(gameId, password) {
             /* POST /api/v0.1/player/:gameId : Join the game, gameId.
              *
