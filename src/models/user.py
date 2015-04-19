@@ -14,7 +14,7 @@ UserBase = GenericDocumentFactory("User", [
 class User(UserBase):
     def __init__(self, json=None, document=None):
         if json:
-            json['player_id'] = str(uuid4())
+            json['player_id'] = str(session.sid)
         super(User, self).__init__(json=json, document=document)
 
     def apply(self):

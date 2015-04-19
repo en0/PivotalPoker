@@ -78,8 +78,17 @@ class Game(object):
         _game_ids = self._db.hkeys('PokerGame')
         print("waiting on queue: {0}".format(self._queue))
 
+        # Load the game model
+        _model = self.reload()
+
         # Loop while the game exists.
         while self._game_id in _game_ids and not event.is_set():
+
+            # Verify owner exists
+            if len(self._db.keys("session:{0}".format(_model.owner_id))) == 0:
+                print("NOTICE: Owner's session expired for game {0}. Close game.".format(self._game_id))
+                self._db.hdel("PokerGame", self._game_id)
+                break
 
             # Heart Beat
             self.keep_alive()
@@ -95,10 +104,6 @@ class Game(object):
                 if _item is None:
                     # Failed to understand request, Skip it.
                     continue
-
-                # Refresh the game model.
-                # This might only need to happen once and just work off the cache.
-                _model = self.reload()
 
                 # Process the request.
                 # noinspection PyBroadException
