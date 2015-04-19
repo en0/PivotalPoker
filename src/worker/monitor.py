@@ -78,7 +78,7 @@ class Monitor():
                     yield Game(gid, db=db)
 
         for game in _games_forever(self._db):
-            if game.is_game_worker_exist():
+            if game.is_game_orphaned():
                 new_thread = threading.Thread(target=game, args=(self._event,))
                 self._threads.append(new_thread)
                 new_thread.start()

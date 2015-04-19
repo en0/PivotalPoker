@@ -20,30 +20,9 @@ class Game(object):
         self._queue = "PokerGame:{0}:queue".format(self._game_id)
         self._heart_beat_key = "PokerGameHeartBeat:{0}".format(self._game_id)
 
-    def is_game_worker_exist(self):
-        # Depending on how this function is used, we might have a race condition here.
-        # We should probably set up a distributed mutex lock to verify only one worker can run a check at a time.
-
-        # Check if there is already a background process on this game.
-        _time = self._db.get(self._heart_beat_key)
-        _now = time()
-
-        # If _time has a value then its possible that a worker is already handing this queue.
-        if _time is not None:
-            # Lets make sure it is still up
-            _delta = (_now - float(_time)) + 10
-
-            # Wait for the timeout to make sure the worker still beats
-            if _delta > 0:
-                sleep(_delta)
-
-            # Try again to pull the heartbeat.
-            if self._db.get(self._heart_beat_key) is not None:
-                # Under the control of another worker
-                return False
-
-        # Game is orphaned, we are safe to pick it up
-        return True
+    def is_game_orphaned(self):
+        # verify game is orphaned
+        return self._db.get(self._heart_beat_key) is None
 
     def decode_item(self, serial_string):
         d = None
