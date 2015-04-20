@@ -25,6 +25,14 @@
             <div class="navbar navbar-default">
                 <a class="navbar-brand" href>Pivotal Poker</a>
                 <ul class="nav navbar-nav pull-right">
+                    <li class="dropdown" ng-if="alerts.length > 0">
+                        <a href class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="text-danger">Alerts</span> <span class="glyphicon glyphicon-bell text-danger"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-repeat="a in alerts"><a href ng-click="clearAlert($index)">[[a]]</a></li>
+                            <li class="divider"></li>
+                            <li><a href ng-click="clearAlerts()">Clear alerts</a></li>
+                        </ul>
+                    </li>
                     <li><a>Player: [[displayName]]</a></li>
                 </ul>
             </div>

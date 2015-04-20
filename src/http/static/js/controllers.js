@@ -2,12 +2,25 @@
 
 app.controller('rootCtrl', ['$rootScope', '$location', '$modal', 'poker-api', function($rootScope, $location, $modal, api) {
 
+    // Array to hold site level alerts.
+    $rootScope.alerts = [];
+
     $rootScope.go = function(path) {
-        /* Short, global function change pages */
+        /* Short, global function change pages
+         *
+         * Arguments:
+         *  path - The path to navigate to.
+         */
         $location.path(path);
     };
 
     $rootScope.showStatusModal = function(jobId, message) {
+        /* Show the status modal for a specific job id.
+         *
+         * Arguments:
+         *  jobId - the job to show the status for.
+         *  message - The initial message to show on the modal.
+         */
         var inst = $modal.open({
             templateUrl: 'partials/jobStatus_modal.html',
             controller: 'jobStatusCtrl',
@@ -19,6 +32,24 @@ app.controller('rootCtrl', ['$rootScope', '$location', '$modal', 'poker-api', fu
         });
 
         return inst;
+    };
+
+    $rootScope.addAlert = function(prefix, text) {
+        /* Add a alert to the global alerts area
+         *
+         * Arguments:
+         *  text - The text for the alert.
+         */
+        $rootScope.alerts.push(prefix + ": " + text);
+    };
+
+    $rootScope.clearAlerts = function() {
+        /* Clear all alerts from global alerts array. */
+        $rootScope.alerts = [];
+    };
+
+    $rootScope.clearAlert = function(index) {
+        $rootScope.alerts.splice(index,1);
     };
 
     var getPlayerName = function() {
@@ -50,9 +81,8 @@ app.controller('rootCtrl', ['$rootScope', '$location', '$modal', 'poker-api', fu
                     getPlayerName();
                 });
             } else {
-                console.log("Oops! My Bad.");
+                $scope.addAlert("ERROR", "Something when seriously wrong here.")
                 console.log(error);
-                alert("this should pop a error.")
             }
         });
     };
@@ -64,9 +94,14 @@ app.controller('rootCtrl', ['$rootScope', '$location', '$modal', 'poker-api', fu
 
 app.controller('homeCtrl', ['$scope', '$modal', 'poker-api', function($scope, $modal, api) {
     document.title = 'Planning Poker';
+
     api.listGames().then(function(games) {
         $scope.games = games.games;
         console.log(games.games);
+    })
+    .catch(function(error) {
+        $scope.addAlert("ERROR", "Failed to retrieve game list.");
+        console.log(error);
     });
 
     function _joinGame(gameId, password) {
@@ -93,8 +128,8 @@ app.controller('homeCtrl', ['$scope', '$modal', 'poker-api', function($scope, $m
 
         })
         .catch(function(error) {
+            $scope.addAlert("ERROR", "Failed to join game.");
             console.log(error);
-            console.log("Should probably pop a error message here.")
         });
 
     }
@@ -136,10 +171,12 @@ app.controller('homeCtrl', ['$scope', '$modal', 'poker-api', function($scope, $m
                 console.log("This should probably just go to the game control window.")
             })
             .catch(function(error) {
-                // Notify an error
+                $scope.addAlert("ERROR", "Failed to create game.");
                 console.log(error);
-                console.log("Should pop a error message here.")
             });
+
+
+
         });
     };
 }]);
@@ -168,19 +205,34 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
                 if(playerId == $scope.playerId)
                     $scope.go('/');
             });
+        })
+        .catch(function(error) {
+            $scope.addAlert("ERROR", "Failed to leave game.")
+            console.log(error);
         });
     };
 
     $scope.cancelHand = function() {
         api.cancelHand($scope.gameId).then(function(job) {
             $scope.showStatusModal(job.job_id, "Canceling hand...");
+        })
+        .catch(function(error) {
+            $scope.addAlert("ERROR", "Failed to cancel hand.")
+            console.log(error);
         });
     }
 
     $scope.applyVote = function(action) {
         console.log($scope.voteResult);
         api.applyVote($scope.gameId, action, $scope.voteResult).then(function(job) {
-            $scope.showStatusModal(job.job_id, "Finalizing vote...");
+            $scope.showStatusModal(job.job_id, "Finalizing vote...")
+            .result.finally(function(data) {
+                $scope.voteResult = null;
+            });
+        })
+        .catch(function(error) {
+            $scope.addAlert("ERROR", "Failed to apply vote.")
+            console.log(error);
         });
     }
 
@@ -192,6 +244,10 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
             .result.then(function(data) {
                 $scope.go('/');
             });
+        })
+        .catch(function(error) {
+            $scope.addAlert("ERROR", "Failed to close game.")
+            console.log(error);
         });
     };
 
@@ -203,6 +259,10 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
             .result.then(function(data) {
                 $scope.newStory = "";
             });
+        })
+        .catch(function(error) {
+            $scope.addAlert("ERROR", "Failed to deal hand.")
+            console.log(error);
         });
     };
 
@@ -211,11 +271,15 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
         api.castVote($scope.gameId, value)
         .then(function(job) {
             $scope.showStatusModal(job.job_id, "Casting vote...");
+        })
+        .catch(function(error) {
+            $scope.addAlert("ERROR", "Failed to cast vote.")
+            console.log(error);
         });
     };
 
     function _updateGame() {
-        // Make sure that the modal is still open.
+        // Make sure that this controller is still active
         if($scope.$$destroyed === true) return;
 
         api.getGame($scope.gameId)
@@ -227,14 +291,17 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
             window.setTimeout(_updateGame, 3000);
         })
         .catch(function(error) {
+            $scope.addAlert("ERROR", "Failed to pull game state.")
             console.log(error);
-            console.log("Show error about issue");
+
+            // Slow down retry.
+            window.setTimeout(_updateGame, 30000);
         });
     }
 
     _updateGame();
     $scope.fakeState = function(state) {
-        $scope.game.state = state;
+        $scope.addAlert("This is a test alert")
     };
 }]);
 
@@ -258,9 +325,9 @@ app.controller('registerCtrl', ['$scope', '$modalInstance', 'poker-api', functio
         .then(function() {
             // Success
             $modalInstance.close($scope.name)
-        }, function(error) {
-            // Error registering session.
-            // Probably should pop a error message here.
+        })
+        .catch(function(error) {
+            $scope.error_message = error;
         });
     };
 
@@ -344,6 +411,10 @@ app.controller('jobStatusCtrl', ['$scope', '$modalInstance', 'poker-api', 'messa
         $modalInstance.close("success");
     }
 
+    function fail() {
+        $modalInstance.dismiss("Failed");
+    }
+
     function long_pull() {
 
         // Make sure that the modal is still open.
@@ -357,7 +428,7 @@ app.controller('jobStatusCtrl', ['$scope', '$modalInstance', 'poker-api', 'messa
             if(result.status == 200) {
                 $scope.message = result.message
                 window.setTimeout(complete, 3000);
-            } else {
+            } else if(result.status == 202) {
                 // Update the message if one is available.
                 if(result.message !== null)
                     $scope.message = result.message;
@@ -365,11 +436,24 @@ app.controller('jobStatusCtrl', ['$scope', '$modalInstance', 'poker-api', 'messa
                 // Wait 1 second and check again.
                 window.setTimeout(long_pull, 1000);
                 console.log(result);
+            } else {
+                // Status changed but not in a good way
+                $scope.message = result.message;
+
+                // Add error message to alerts
+                $scope.addAlert("WARNING", result.message);
+
+                // Close modal after 2 seconds
+                window.setTimeout(fail, 2000);
             }
         })
         .catch(function(error) {
             console.log(error);
-            console.log("Should show the error on the status modal.")
+            $scope.message = "Something went very wrong here.";
+            $scope.addAlert("ERROR", "Failed to get job state.");
+
+            // Close modal after 2 seconds
+            window.setTimeout(fail, 2000);
         });
     }
 
