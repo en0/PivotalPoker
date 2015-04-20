@@ -67,6 +67,7 @@ class Monitor():
         self._db = _get_db(**self._config)
         self._threads = []
         self._event = threading.Event()
+        self._last_cleanup = int(time()) - 100
 
     def stop(self):
         self._event.set()
@@ -90,6 +91,15 @@ class Monitor():
 
     def _db_maintenance(self):
         _now = int(time())
+
+        # Cleanup every 100 seconds otherwise, skip it
+        if (_now - self._last_cleanup) < 100:
+            return
+
+        # Store as the "last Cleanup time"
+        self._last_cleanup = _now
+
+        # Clean up old jobs
         for job_id in self._db.hkeys(models.BackgroundJob.__document_namespace__):
             _job = models.BackgroundJob.load(job_id, db=self._db)
             if (_now - _job.mtime) > 100:
