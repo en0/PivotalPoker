@@ -5,8 +5,8 @@
 </dl -->
 
 <div class="pull-right">
-    <button class="btn btn-warning" ng-click="leaveGame(playerId)">Exit Game</button>
-    <button ng-if="isOwner" class="btn btn-danger" ng-click="closeGame()">End Game</button>
+    <button class="btn btn-warning" ng-click="leaveGame(playerId)" popover-placement="bottom" popover-trigger="mouseenter" popover="You leave the game.">Exit Game</button>
+    <button ng-if="isOwner" class="btn btn-danger" ng-click="closeGame()" popover-placement="bottom" popover-trigger="mouseenter" popover="Permanently end the game.">End Game</button>
 </div>
 <h3>[[ game.title ]]</h3>
 <p class="lead">[[ game.desc ]]</p>
@@ -30,7 +30,7 @@
                     </textarea>
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-success" ng-click="dealHand()">Send Story</button>
+                    <button class="btn btn-success" ng-click="dealHand()" popover-placement="right" popover-trigger="mouseenter" popover="Post new story to players for a vote.">Send Story</button>
                 </div>
             </form>
         </div>
@@ -57,9 +57,9 @@
                         </span>
                         <input type="text" class="form-control" name="txtResult" id="txtResult" ng-model="$parent.$parent.voteResult" />
                     </div>
-                    <button class="btn btn-success" ng-click="applyVote('Accept');">Accept</button>
-                    <button class="btn btn-warning" ng-click="applyVote('Revote');">Re-vote</button>
-                    <button class="btn btn-danger" ng-click="applyVote('Cancel');">Reject</button>
+                    <button class="btn btn-success" ng-click="applyVote('Accept');" popover-placement="top" popover-trigger="mouseenter" popover="Accept current point value.">Accept</button>
+                    <button class="btn btn-warning" ng-click="applyVote('Revote');" popover-placement="top" popover-trigger="mouseenter" popover="Post story for re-vote.">Re-vote</button>
+                    <button class="btn btn-danger" ng-click="applyVote('Cancel');" popover-placement="top" popover-trigger="mouseenter" popover="Retract story; return to open game.">Reject</button>
                 </form>
             </div><br/>
             <div class="cardInDeck" ng-repeat="p in game.current_hand.votes">
@@ -79,16 +79,16 @@
             </ul -->
             <table class="table">
                 <tr ng-repeat="(key, p) in game.players">
-                    <td ng-if="game.state == 'Playing' && game.current_hand.votes[key] != null"><span class="glyphicon glyphicon-check" style="color: #5cb85c;"></span></td>
-                    <td ng-if="game.state == 'Playing' && game.current_hand.votes[key] == null"><span class="glyphicon glyphicon-unchecked"></span></td>
+                    <td ng-if="game.state == 'Playing' && game.current_hand.votes[key] != null"><span class="glyphicon glyphicon-check" style="color: #5cb85c;" popover-placement="top" popover-trigger="mouseenter" popover="Player has voted."></span></td>
+                    <td ng-if="game.state == 'Playing' && game.current_hand.votes[key] == null"><span class="glyphicon glyphicon-unchecked" popover-placement="top" popover-trigger="mouseenter" popover="Waiting for vote."></span></td>
                     <td ng-if="game.state == 'Reviewing' && game.current_hand.votes[key] != null"><span class="glyphicon glyphicon-check" style="color: #5cb85c;"></span></td>
                     <td>[[p]]</td>
-                    <td ng-if="isOwner" ng-click="leaveGame(key)"><span class="glyphicon glyphicon-remove"></span></td>
+                    <td ng-if="isOwner" ng-click="leaveGame(key)"><span class="glyphicon glyphicon-remove" popover-placement="top" popover-trigger="mouseenter" popover="Remove player."></span></td>
                 </tr>
             </table>
         </div>
         <div class="pull-right">
-            <button class="btn btn-warning" ng-if="isOwner && game.state == 'Playing'" ng-click="cancelHand()">Cancel Hand</button>
+            <button class="btn btn-warning" ng-if="isOwner && game.state == 'Playing'" ng-click="cancelHand()" popover-placement="left" popover-trigger="mouseenter" popover="Retract story; return to open game.">Cancel Hand</button>
         </div>
     </div>
 </div>

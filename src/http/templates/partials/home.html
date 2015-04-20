@@ -10,9 +10,9 @@
             <tr ng-repeat="j in games">
                 <td>[[ j.title ]]</td>
                 <td>[[ j.owner_name ]]</td>
-                <td><button class="btn btn-xs btn-primary pull-right" ng-click="joinGame(j.game_id, j.has_password)">&nbsp;Join&nbsp;</button></td>
+                <td><button class="btn btn-xs btn-primary pull-right" ng-click="joinGame(j.game_id, j.has_password)" popover-placement='left' popover-trigger="mouseenter" popover="Join the game as a player.">&nbsp;Join&nbsp;</button></td>
             </tr>
         </table>
-        <button class="btn btn-primary pull-right" ng-click="showCreateGameModal()">Create Game</button>
+        <button class="btn btn-primary pull-right" ng-click="showCreateGameModal()" popover-trigger="mouseenter" popover-placement='left' popover="Create a new, custom game.">Create Game</button>
     </div>
 </div>
