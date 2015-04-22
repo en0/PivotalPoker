@@ -1,10 +1,17 @@
-#### To Run Server
+## Using with docker
+First, update the poker.conf file to suite your needs. If you plan on running on a redis instance other then the one in the same container, make sure to remove the redis service script in conf.d/
+
+### Build docker container
 ```bash
-cd src/
-gunicorn -k gevent -b IP:PORT run:app
+docker build -t pivotalpoker:custom .
 ```
 
----
+### Running in docker
+```bash
+docker run -t -i -p 80:5000 pivotalpoker:custom
+```
+
+You can now access Pivotal Poker at http://localhost
 
 ## REST Api
 
