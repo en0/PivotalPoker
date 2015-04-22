@@ -87,7 +87,7 @@ class Game(object):
                 # Process the request.
                 # noinspection PyBroadException
                 try:
-                    self.process(_model, _item, count=2)
+                    self.process(_model, _item)
                 except:
                     _item.set_job_status(500, message="The job encountered an unknown error.")
 
@@ -96,7 +96,7 @@ class Game(object):
 
         print("Exiting: {0}".format(self._queue))
 
-    def process(self, game_model, item, count=0):
+    def process(self, game_model, item):
         # [ 'Open', 'Playing', 'Reviewing' ]
         result = False
         if item.doc_type == models.WorkerRequest.__document_namespace__:
@@ -112,10 +112,8 @@ class Game(object):
 
         print "Process success: {0}".format(result)
 
-        if not result and count > 1:
-            return self.process(game_model, item, count-1)
-        elif not result:
-            item.set_job_status(400, message="Job was not acceptable.")
+        if not result:
+            item.set_job_status(503, message="Failed to process job")
 
         return result
 
@@ -145,7 +143,10 @@ class Game(object):
             game_model.add_player(player=_player)
             _ret = game_model.save()
 
-            return _ret and item.set_job_status(200, message="Joining the game.")
+            if _ret:
+                return item.set_job_status(200, message="Joining the game.")
+
+            return False
 
         return item.set_job_status(409, message="The game is not open.")
 
@@ -156,7 +157,10 @@ class Game(object):
         if _request.params == _request.request_by or _request.request_by == game_model.owner_id:
             game_model.remove_player(player_id=_request.params)
             _ret = game_model.save()
-            return _ret and item.set_job_status(200, message="Player removed.")
+            if _ret:
+                return item.set_job_status(200, message="Player removed.")
+
+            return False
 
         return item.set_job_status(403, message="Request Forbidden")
 
@@ -170,7 +174,10 @@ class Game(object):
         game_model.state = 'Playing'
 
         _ret = game_model.save()
-        return _ret and item.set_job_status(200, message="Hand dealt.")
+        if _ret:
+            return item.set_job_status(200, message="Hand dealt.")
+
+        return False
 
     def process_abort_hand(self, game_model, item):
         _request = models.WorkerRequest(document=item.data)
@@ -184,7 +191,11 @@ class Game(object):
         game_model.current_hand = None
         game_model.state = 'Open'
         _ret = game_model.save()
-        return _ret and item.set_job_status(200, message="Hand canceled.")
+
+        if _ret:
+            return item.set_job_status(200, message="Hand canceled.")
+
+        return False
 
     def process_close_game(self, game_model, item):
         _request = models.WorkerRequest(document=item.data)
@@ -209,7 +220,10 @@ class Game(object):
         game_model.cast_vote(_vote)
         _ret = game_model.save()
 
-        return _ret and item.set_job_status(200, message="Vote accepted.")
+        if _ret:
+            return item.set_job_status(200, message="Vote accepted.")
+
+        return False
 
     def process_accept_vote(self, game_model, item):
         if game_model.state != 'Reviewing':
@@ -226,17 +240,23 @@ class Game(object):
                 return item.set_job_status(500, message="{0} is not a valid result.".format(_result.points))
             game_model.complete_hand(_p)
             _ret = game_model.save()
-            return _ret and item.set_job_status(200, message="Hand complete.")
+            if _ret:
+                return item.set_job_status(200, message="Hand complete.")
+            return False
 
         elif 'Revote' == _result.result:
             game_model.resetVote()
             _ret = game_model.save()
-            return _ret and item.set_job_status(200, message="Reset hand complete.")
+            if _ret:
+                return item.set_job_status(200, message="Reset hand complete.")
+            return False
 
         elif 'Cancel' == _result.result:
             game_model.current_hand = None
             game_model.state = 'Open'
             _ret = game_model.save()
-            return _ret and item.set_job_status(200, message="Hand canceled.")
+            if _ret:
+                return item.set_job_status(200, message="Hand canceled.")
+            return False
 
         return item.set_job_status(400, message="Unknown result action.")

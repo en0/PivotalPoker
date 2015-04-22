@@ -1,8 +1,8 @@
 __author__ = 'en0'
 
-
 from models.generic_document import GenericDocumentFactory
 import models
+from time import sleep
 
 
 QueueItemBase = GenericDocumentFactory('QueueItem', [
@@ -36,9 +36,16 @@ class QueueItem(QueueItemBase):
         if self._job is None:
             self._job = models.BackgroundJob.load(self.job_id, db=self._db)
 
+        _tries = 10
+
         if self._job:
             self._job.status = status
             self._job.message = message
-            self._job.save()
+
+            while self._job.save() == 0 and _tries > 1:
+                _tries -= 1
+                sleep(1)
+
             return True
+
         return False
