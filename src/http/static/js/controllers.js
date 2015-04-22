@@ -95,14 +95,20 @@ app.controller('rootCtrl', ['$rootScope', '$location', '$modal', 'poker-api', fu
 app.controller('homeCtrl', ['$scope', '$modal', 'poker-api', function($scope, $modal, api) {
     document.title = 'Planning Poker';
 
-    api.listGames().then(function(games) {
-        $scope.games = games.games;
-        console.log(games.games);
-    })
-    .catch(function(error) {
-        $scope.addAlert("ERROR", "Failed to retrieve game list.");
-        console.log(error);
-    });
+    function _loadGames() {
+        // Make sure that this controller is still active
+        if($scope.$$destroyed === true) return;
+
+        api.listGames().then(function(games) {
+            $scope.games = games.games;
+            window.setTimeout(_loadGames, 10000);
+        })
+        .catch(function(error) {
+            $scope.addAlert("ERROR", "Failed to retrieve game list.");
+            console.log(error);
+            window.setTimeout(_loadGames, 30000);
+        });
+    }
 
     function _joinGame(gameId, password) {
         /* Join the game, gameId, with the supplied password
@@ -174,11 +180,10 @@ app.controller('homeCtrl', ['$scope', '$modal', 'poker-api', function($scope, $m
                 $scope.addAlert("ERROR", "Failed to create game.");
                 console.log(error);
             });
-
-
-
         });
     };
+
+    _loadGames();
 }]);
 
 app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($scope, $routeParams, api) {
