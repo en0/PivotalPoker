@@ -305,9 +305,6 @@ app.controller('playCtrl', ['$scope', '$routeParams', 'poker-api', function($sco
     }
 
     _updateGame();
-    $scope.fakeState = function(state) {
-        $scope.addAlert("This is a test alert")
-    };
 }]);
 
 app.controller('aboutCtrl', ['$scope', function($scope) {
