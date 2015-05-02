@@ -429,14 +429,14 @@ app.controller('jobStatusCtrl', ['$scope', '$modalInstance', 'poker-api', 'messa
             // Otherwise they are still pending.
             if(result.status == 200) {
                 $scope.message = result.message
-                window.setTimeout(complete, 3000);
+                window.setTimeout(complete, 1000);
             } else if(result.status == 202) {
                 // Update the message if one is available.
                 if(result.message !== null)
                     $scope.message = result.message;
 
-                // Wait 5 second and check again.
-                window.setTimeout(long_pull, 5000);
+                // Wait 1 second and check again.
+                window.setTimeout(long_pull, 1000);
                 console.log(result);
             } else {
                 // Status changed but not in a good way
@@ -445,8 +445,8 @@ app.controller('jobStatusCtrl', ['$scope', '$modalInstance', 'poker-api', 'messa
                 // Add error message to alerts
                 $scope.addAlert("WARNING", result.message);
 
-                // Close modal after 10 seconds
-                window.setTimeout(fail, 10000);
+                // Close modal after 5 seconds
+                window.setTimeout(fail, 5000);
             }
         })
         .catch(function(error) {
