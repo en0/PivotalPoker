@@ -33,9 +33,8 @@ class Game(GameBase):
 
     @classmethod
     def list(cls, db):
-        _db = db
         _games = []
-        for game_id in _db.hkeys(cls.__document_namespace__):
+        for game_id in cls.get_document_ids(db):
             _game = super(Game, cls).load(game_id, db=db)
             if _game.state == 'Open':
                 _games.append({
@@ -58,7 +57,7 @@ class Game(GameBase):
         _ret['game_id'] = self.uuid
         return _ret
 
-    #def register_game(self):
+    # def register_game(self):
     #    key = "{0}:active".format(self.__document_namespace__)
     #    self.__db__.lpush(key, self.uuid)
 
@@ -80,7 +79,8 @@ class Game(GameBase):
 
     def cast_vote(self, vote):
         # verify hand and players
-        if not self.__document__['current_hand'] or not self.__document__['players']:
+        if (not self.__document__['current_hand'] or
+           not self.__document__['players']):
             return
 
         # Get player name and verify player is in game
@@ -116,7 +116,8 @@ class Game(GameBase):
         if not self.__document__['current_hand']:
             return
 
-        # Move the current hand into the completed hands list and empty the current hand
+        # Move the current hand into the completed
+        # hands list and empty the current hand
         complete_hand = copy.deepcopy(self.__document__['current_hand'])
         complete_hand['points'] = points
         self.__document__['current_hand'] = None

@@ -15,8 +15,12 @@ class RedisDocument(object):
     def save(self):
         if self.__is_dirty__:
             # Pretty strait forward.
-            dat = self.__serializer__.dumps(self.__document__)
-            self.__db__.hset(self.__document_namespace__, self.__uuid__, dat)
+            _set_document(
+                self.__document_namespace__,
+                self.__uuid__,
+                self.__serializer__.dumps(self.__document__),
+                self.__db__
+            )
             return True
         return False
 
@@ -57,7 +61,7 @@ class RedisDocument(object):
     @classmethod
     def load(cls, uuid, db):
         _ret = cls(uuid, db=db)
-        dat = _ret.__db__.hget(cls.__document_namespace__, uuid)
+        dat = _get_document(cls.__document_namespace__, uuid, db)
 
         if not dat:
             return None
@@ -69,6 +73,42 @@ class RedisDocument(object):
             optional_fields=cls.__required_fields__ + cls.__optional_fields__
         )
         return _ret
+
+    @classmethod
+    def exists(cls, uuid, db):
+        dat = _get_document(cls.__document_namespace__, uuid, db)
+        if not dat:
+            return False
+        return True
+
+    @classmethod
+    def get_document_ids(cls, db):
+        return _get_uuids(cls.__document_namespace__, db)
+
+
+def _format_key(namespace, uuid):
+    return "{0}:{1}".format(namespace, uuid)
+
+
+def _get_document(namespace, uuid, db):
+    key = _format_key(namespace, uuid)
+    return db.get(key)
+
+
+def _get_uuids(namespace, db):
+    _keys = db.keys("{0}:*".format(namespace))
+    _key_set = set()
+    for _key in _keys:
+        _key_split = _key.split(':')
+        if len(_key_split) > 1:
+            _key_set.add(_key_split[1])
+
+    return [x for x in _key_set]
+
+
+def _set_document(namespace, uuid, value, db):
+    key = _format_key(namespace, uuid)
+    return db.set(key, value)
 
 
 def RedisDocumentFactory(namespace, fields, serializer=None):
@@ -95,7 +135,11 @@ def RedisDocumentFactory(namespace, fields, serializer=None):
             del self.__document__[field]
             self.__is_dirty__ = True
 
-        _doc_string = "Required field: {0}." if is_required else "Optional field: {0}."
+        if is_required:
+            _doc_string = "Required field: {0}."
+        else:
+            _doc_string = "Optional field: {0}."
+
         _doc_string += " This field is public." if is_public else ""
 
         return property(__getter, __setter, __del, _doc_string.format(field))

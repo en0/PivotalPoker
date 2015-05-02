@@ -435,8 +435,8 @@ app.controller('jobStatusCtrl', ['$scope', '$modalInstance', 'poker-api', 'messa
                 if(result.message !== null)
                     $scope.message = result.message;
 
-                // Wait 1 second and check again.
-                window.setTimeout(long_pull, 1000);
+                // Wait 5 second and check again.
+                window.setTimeout(long_pull, 5000);
                 console.log(result);
             } else {
                 // Status changed but not in a good way
@@ -445,8 +445,8 @@ app.controller('jobStatusCtrl', ['$scope', '$modalInstance', 'poker-api', 'messa
                 // Add error message to alerts
                 $scope.addAlert("WARNING", result.message);
 
-                // Close modal after 2 seconds
-                window.setTimeout(fail, 2000);
+                // Close modal after 10 seconds
+                window.setTimeout(fail, 10000);
             }
         })
         .catch(function(error) {
@@ -460,5 +460,5 @@ app.controller('jobStatusCtrl', ['$scope', '$modalInstance', 'poker-api', 'messa
     }
 
     // Start checking the job's status.
-    long_pull();
+    window.setTimeout(long_pull, 3000);
 }]);

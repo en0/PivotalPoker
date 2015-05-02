@@ -3,14 +3,14 @@ __author__ = 'en0'
 import pickle
 import models
 from redis import Redis
-from time import time, sleep
+from time import time
 
 
 class Game(object):
 
     @classmethod
     def get_games(cls, db):
-        for _game_key in db.hkeys("PokerGame"):
+        for _game_key in models.Game.get_document_ids(db):
             yield _game_key
 
     def __init__(self, game_id, db):
@@ -27,8 +27,8 @@ class Game(object):
     def decode_item(self, serial_string):
         d = None
         try:
-            # Try to unpack the queue item. if the queue data is not formatted correctly,
-            # it will though a KeyError.
+            # Try to unpack the queue item. if the queue data is not
+            # formatted correctly, it will though a KeyError.
             d = pickle.loads(serial_string)
             return models.QueueItem(document=d, db=self._db)
         except KeyError as e:
@@ -54,18 +54,21 @@ class Game(object):
 
     def __call__(self, event):
 
-        _game_ids = self._db.hkeys('PokerGame')
         print("waiting on queue: {0}".format(self._queue))
 
         # Load the game model
         _model = self.reload()
 
         # Loop while the game exists.
-        while self._game_id in _game_ids and not event.is_set():
+        while (models.Game.exists(self._game_id, self._db) and
+               not event.is_set()):
 
             # Verify owner exists
             if len(self._db.keys("session:{0}".format(_model.owner_id))) == 0:
-                print("NOTICE: Owner's session expired for game {0}. Close game.".format(self._game_id))
+                print(
+                    "NOTICE: Owner's session expired for game {0}. Close game."
+                    .format(self._game_id)
+                )
                 _model.delete()
                 break
 
@@ -89,10 +92,10 @@ class Game(object):
                 try:
                     self.process(_model, _item)
                 except:
-                    _item.set_job_status(500, message="The job encountered an unknown error.")
-
-            # re-pull game ids so we can verify our game is still in play
-            _game_ids = self._db.hkeys('PokerGame')
+                    _item.set_job_status(
+                        500,
+                        message="The job encountered an unknown error."
+                    )
 
         print("Exiting: {0}".format(self._queue))
 
@@ -153,8 +156,10 @@ class Game(object):
     def process_remove_player(self, game_model, item):
         _request = models.WorkerRequest(document=item.data)
 
-        # Only the user can remove anyone. otherwise users can only remove themselves.
-        if _request.params == _request.request_by or _request.request_by == game_model.owner_id:
+        # Only the user can remove anyone. otherwise users
+        # can only remove themselves.
+        if (_request.params == _request.request_by or
+           _request.request_by == game_model.owner_id):
             game_model.remove_player(player_id=_request.params)
             _ret = game_model.save()
             if _ret:
@@ -235,9 +240,19 @@ class Game(object):
             try:
                 _p = int(_result.points)
                 if _p not in game_model.pts_scale:
-                    return item.set_job_status(400, message="{0} is not a valid value for this game.".format(_p))
+                    return item.set_job_status(
+                        400,
+                        message="{0} is not a valid value for this game."
+                        .format(_p)
+                    )
+
             except ValueError:
-                return item.set_job_status(500, message="{0} is not a valid result.".format(_result.points))
+                return item.set_job_status(
+                    500,
+                    message="{0} is not a valid result."
+                    .format(_result.points)
+                )
+
             game_model.complete_hand(_p)
             _ret = game_model.save()
             if _ret:
