@@ -45,9 +45,8 @@ class BackgroundJob(BackgroundJobBase):
 
     @classmethod
     def list(cls, db):
-        _db = db
         _jobs = []
-        for job_id in _db.hkeys(cls.__document_namespace__):
+        for job_id in cls.get_document_ids(db):
             _job = super(BackgroundJob, cls).load(job_id, db=db)
             _jobs.append(_job.entity)
         return _jobs

@@ -25,7 +25,11 @@ class RedisDocument(object):
         return False
 
     def delete(self):
-        self.__db__.hdel(self.__document_namespace__, self.__uuid__)
+        _delete_document(
+            self.__document_namespace__,
+            self.__uuid__,
+            self.__db__
+        )
 
     @property
     def uuid(self):
@@ -109,6 +113,11 @@ def _get_uuids(namespace, db):
 def _set_document(namespace, uuid, value, db):
     key = _format_key(namespace, uuid)
     return db.set(key, value)
+
+
+def _delete_document(namespace, uuid, db):
+    key = _format_key(namespace, uuid)
+    db.delete(key)
 
 
 def RedisDocumentFactory(namespace, fields, serializer=None):

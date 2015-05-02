@@ -103,7 +103,7 @@ class Monitor():
         self._last_cleanup = _now
 
         # Clean up old jobs
-        for job_id in self._db.hkeys(models.BackgroundJob.__document_namespace__):
+        for job_id in models.BackgroundJob.get_document_ids(self._db):
             _job = models.BackgroundJob.load(job_id, db=self._db)
             if (_now - _job.mtime) > 100:
                 print("Removing expired key: {0}".format(job_id))
